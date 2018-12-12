@@ -1,0 +1,34 @@
+/*ERRORS*/
+arr1 arr2 = 2;
+chr	ch_arr	[5][5][2][1];
+in	ch_ar;
+do init_arr = {1,2,3,4,5,6,7,8,9};
+char	ch_arr	[5;
+char	ch_arr	5];
+
+
+
+/*UNINITIALIZED ARRAYS*/
+char	ch_arr	[5][5][2][1];
+int  	in_arr	[5][5][2][1];
+float 	fl_arr	[5][5][2][1];
+long	lo_arr	[5][5][2][1];
+double 	do_arr	[5][5][2][1];
+
+/*UNINITIALIZED VARIABLES*/
+char	ch_ar;
+int		in_var;
+float	fl_var;
+long	lo_var;
+double	do_var;
+
+/*LIST OF UNINITIALIZED VARIABLES*/
+char	ch_var1,ch_var2,ch_var3;
+
+/*LIST OF INITIALIZED VARIABLES*/
+int in_init_var1 = 5,in_init_var2 = 6,in_init_var3 = 7;
+
+/*INITIALIZED ARRAY*/
+int init_arr = {1,2,3,4,5,6,7,8,9};
+
+

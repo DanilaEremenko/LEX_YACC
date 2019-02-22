@@ -25,7 +25,7 @@ else
 		cc *.c
 	elif [[ $1 = "-e" ]]
 	then
-		for testIn in $(ls | grep .in )
+		for testIn in $(ls | grep "\.in" )
 		do
 			testOut=$( echo $testIn | cut -d . -f1 )".out"
 			./a.out <$testIn >$testOut

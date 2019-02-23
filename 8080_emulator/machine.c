@@ -40,16 +40,16 @@ void machine_print_mem_by_indexes(int indexes[], int indexes_len) {
 }
 
 void machine_print_all_reg() {
-	printf("a \t= %d\n", proc.a);
-	printf("b \t= %d\n", proc.b);
-	printf("c \t= %d\n", proc.c);
-	printf("d \t= %d\n", proc.d);
-	printf("e \t= %d\n", proc.e);
-	printf("h \t= %d\n", proc.h);
-	printf("l \t= %d\n", proc.l);
-	printf("m \t= %d\n", proc.m);
-	printf("pws\t= %d\n", proc.pws);
-	printf("sp \t= %d\n", proc.sp);
+	printf("a \t= %o\n", proc.a);
+	printf("b \t= %o\n", proc.b);
+	printf("c \t= %o\n", proc.c);
+	printf("d \t= %o\n", proc.d);
+	printf("e \t= %o\n", proc.e);
+	printf("h \t= %o\n", proc.h);
+	printf("l \t= %o\n", proc.l);
+	printf("m \t= %o\n", proc.m);
+	printf("pws\t= %o\n", proc.pws);
+	printf("sp \t= %o\n", proc.sp);
 
 }
 
@@ -59,9 +59,9 @@ int machine_get_opcode_of_mnem(char *mnem) {
 	else if (!strcmp(mnem, "MOV"))
 		return MOV_OP;
 	else if (!strcmp(mnem, "INX"))
-			return INX_OP;
+		return INX_OP;
 	else if (!strcmp(mnem, "HLT"))
-				return HLT_OP;
+		return HLT_OP;
 	else
 		printf("UNDEFINED MNEMONIC = %s\n", mnem);
 	return -1;
@@ -136,6 +136,8 @@ void machine_set_reg_pair(char *reg_name, int number_1, int number_2) {
 	} else if (!strcmp(reg_name, "H")) {
 		proc.h = number_1;
 		proc.l = number_2;
+	} else if (!strcmp(reg_name, "SP")) {
+		proc.sp = (number_2 << 8) + number_1;
 	} else
 		printf("UNDEFINED REG PAIR = %s\n", reg_name);
 
@@ -169,6 +171,25 @@ int machine_get_reg(char *reg_name) {
 		printf("UNDEFINED REG%s\n", reg_name);
 
 	return -1;
+
+}
+
+int *machine_get_reg_pair(char *reg_name) {
+	int result[2];
+
+	if (!strcmp(reg_name, "B")) {
+		result[0] = proc.b;
+		result[1] = proc.c;
+	} else if (!strcmp(reg_name, "D")) {
+		result[0] = proc.d;
+		result[1] = proc.e;
+	} else if (!strcmp(reg_name, "H")) {
+		result[0] = proc.h;
+		result[1] = proc.l;
+	} else
+		printf("UNDEFINED REG PAIR = %s\n", reg_name);
+
+	return &result;
 
 }
 
@@ -206,7 +227,7 @@ int OTD(int oct) {
 
 	while (oct != 0) {
 		dec += oct % 10 * mult;
-		mult*=8;
+		mult *= 8;
 		oct /= 10;
 	}
 

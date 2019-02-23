@@ -2,6 +2,8 @@
 %token MOV
 %token INX
 %token HLT
+%token PUSH
+%token POP
 %token<text>REG
 %token<ival>NUM
 %token COMMENTS
@@ -62,7 +64,7 @@ line:	NUM ':' LXI REG ';' NUM ':' NUM ';' NUM ':' NUM ';'
 				};
 |	NUM ':' INX REG ';'
 				{
-				proc.mem[OTD($1)] = (INX_OP << 3)+ machine_get_opcode_of_mnem("INX");
+				proc.mem[OTD($1)] = (machine_get_code_of_reg($4) << 3)+ INX_OP;
 				machine_add_reg($4,1);
 				};
 				
@@ -74,10 +76,30 @@ line:	NUM ':' LXI REG ';' NUM ':' NUM ';' NUM ':' NUM ';'
 				machine_print_all_reg();
 				
 				printf("----------mem---------\n");
-				int indexes[] = {0,1,2,3,4,5,6,7,10,11,200,201};//must be defined manually
+				int indexes[] = {0,1,2,3,4,5,6,7,10,11,129,130};//must be defined manually
 				machine_print_mem_by_indexes(indexes,sizeof(indexes)/4);
-				}
+				//machine_print_mem(0,200);
+				};
 
+|	NUM ':' PUSH REG ';'
+				{
+				proc.mem[OTD($1)] = (3<<6) + (machine_get_code_of_reg($4)<<3) +  5;
+				
+				int *reg_pair = malloc(sizeof(int)*2);
+				*reg_pair = machine_get_reg_pair($4);
+				printf("pair = %d %d\n",reg_pair[0],reg_pair[1]);
+				printf("addrs = %d %d\n",proc.sp,proc.sp-1);
+				proc.mem[proc.sp] = reg_pair[0];
+				proc.mem[proc.sp-1] = reg_pair[1];
+				proc.sp-=2;
+				};
+				
+|	NUM ':' POP REG ';'
+				{
+				proc.mem[OTD($1)] = (3<<6) + (machine_get_code_of_reg($4)<<3) +  1;
+				machine_set_reg_pair($4, proc.mem[OTD(proc.sp+1)], proc.mem[OTD(proc.sp+2)]);
+				proc.sp+=2;
+				};
 %%
 
 

@@ -35,6 +35,8 @@ LXI							{return LXI;}
 MOV							{return MOV;}
 INX							{return INX;}
 HLT							{return HLT;}
+PUSH						{return PUSH;}
+POP							{return POP;}
 
 
 {regs}						{ yylval.text = strdup(yytext);return REG; }

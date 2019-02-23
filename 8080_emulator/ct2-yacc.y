@@ -69,10 +69,12 @@ line:	NUM ':' LXI REG ';' NUM ':' NUM ';' NUM ':' NUM ';'
 |	NUM ':' HLT ';'
 				{
 				proc.mem[OTD($1)] = HLT_OP;
+				
 				printf("----------regs----------\n");
 				machine_print_all_reg();
+				
 				printf("----------mem---------\n");
-				int indexes[] = {0,1,2,3,4,5,6,7,10,11,200,201};
+				int indexes[] = {0,1,2,3,4,5,6,7,10,11,200,201};//must be defined manually
 				machine_print_mem_by_indexes(indexes,sizeof(indexes)/4);
 				}
 

@@ -48,6 +48,5 @@ void machine_set_reg_pair(char *reg_name, int number_1, int number_2);
 
 int machine_get_reg(char *reg_name);
 
-int convert_dec_to_oct(int oct);
-
+int OTD(int oct);
 //#endif /* 8080_EMULATOR_MACHINE_H_ */

@@ -200,18 +200,6 @@ void machine_add_reg(char *reg_name, int num) {
 
 }
 
-int convert_dec_to_oct(int dec) {
-	int oct = 0;
-	int mult = 1;
-
-	while (dec != 0) {
-		oct += dec % 8 * mult;
-		mult *= 10;
-		dec /= 8;
-	}
-	return oct;
-}
-
 int OTD(int oct) {
 	int dec = 0;
 	int mult = 1;

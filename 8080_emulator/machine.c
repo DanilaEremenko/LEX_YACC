@@ -35,7 +35,7 @@ void machine_print_mem(int from, int to) {
 
 void machine_print_mem_by_indexes(int indexes[], int indexes_len) {
 	for (int i = 0; i < indexes_len; ++i)
-		printf("%d:%o\n", indexes[i],proc.mem[indexes[i]]);
+		printf("%d:%o\n", indexes[i], proc.mem[OTD(indexes[i])]);
 
 }
 
@@ -58,6 +58,10 @@ int machine_get_opcode_of_mnem(char *mnem) {
 		return LXI_OP;
 	else if (!strcmp(mnem, "MOV"))
 		return MOV_OP;
+	else if (!strcmp(mnem, "INX"))
+			return INX_OP;
+	else if (!strcmp(mnem, "HLT"))
+				return HLT_OP;
 	else
 		printf("UNDEFINED MNEMONIC = %s\n", mnem);
 	return -1;
@@ -196,21 +200,28 @@ void machine_add_reg(char *reg_name, int num) {
 
 }
 
-int convert_oct_to_dec(int oct) {
-	int dec = 0;
+int convert_dec_to_oct(int dec) {
+	int oct = 0;
+	int mult = 1;
 
+	while (dec != 0) {
+		oct += dec % 8 * mult;
+		mult *= 10;
+		dec /= 8;
+	}
+	return oct;
+}
+
+int OTD(int oct) {
+	int dec = 0;
 	int mult = 1;
 
 	while (oct != 0) {
-		dec += oct % 8 * mult;
-		mult *= 10;
-		oct /= 8;
+		dec += oct % 10 * mult;
+		mult*=8;
+		oct /= 10;
 	}
+
 	return dec;
-}
-
-int conver_dec_to_oct(int dec){
-
-
 
 }

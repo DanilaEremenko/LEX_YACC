@@ -36,7 +36,6 @@ MOV							{return MOV;}
 INX							{return INX;}
 HLT							{return HLT;}
 
-PRINT_ALL					{return PRINT_ALL;}
 
 {regs}						{ yylval.text = strdup(yytext);return REG; }
 							

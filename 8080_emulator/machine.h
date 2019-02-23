@@ -16,6 +16,8 @@
 
 #define LXI_OP 1
 #define MOV_OP 1
+#define INX_OP 3
+#define HLT_OP 118
 
 #define MEM_SIZE 1024
 
@@ -46,6 +48,6 @@ void machine_set_reg_pair(char *reg_name, int number_1, int number_2);
 
 int machine_get_reg(char *reg_name);
 
-int convert_oct_to_dec(int oct);
+int convert_dec_to_oct(int oct);
 
 //#endif /* 8080_EMULATOR_MACHINE_H_ */

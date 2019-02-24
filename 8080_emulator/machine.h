@@ -12,22 +12,23 @@
 #define H_CODE 4
 #define L_CODE 5
 #define M_CODE 6
-#define SP_CODE 10
-#define PWS_CODE 11
+#define SP_CODE 6
+#define PSW_CODE 6
 
 //OPCODES
 #define LXI_OP 1
 #define MOV_OP 1
 #define INX_OP 3
-#define HLT_OP 118
+#define HLT_OP (1<<6) | (6<<3) | (6<<0)
+#define DAA_OP (0<<6) | (4<<3) | (7<<0)
 
 //FLAGS
-#define DEF_FLAG	(0<<7)&(0<<6)&(0<<5)&(0<<4)&(0<<3)&(0<<2)&(0<<1)&(1<<0)
-#define SIGN 		(1<<7)
-#define ZERO 		(1<<6)
-#define AC			(1<<4)
-#define PARITET		(1<<2)
-#define CARRY 		(1<<0)
+#define DEF_FLAG	0xff
+#define SIGN_FLAG 	(1<<7)
+#define ZERO_FLAG 	(1<<6)
+#define AC_FLAG		(1<<4)
+#define PAR_FLAG	(1<<2)
+#define CARRY_FLAG 	(1<<0)
 
 #define MEM_SIZE 1024
 
@@ -35,8 +36,9 @@ struct processor_8086 {
 	int mem[MEM_SIZE];
 	int max_sp;
 	int sp; //TODO check
-	int a; //acumul
-	int b, c, d, e, h, l, m; //GPR
+	int a; //accumulator
+	int b, c, d, e, h, l;//GPR
+	int m; //memory
 	int f; //flag register
 	int psw; //TODO check
 	int reg_pair[2]; //current pair

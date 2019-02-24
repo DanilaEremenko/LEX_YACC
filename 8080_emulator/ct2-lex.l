@@ -1,4 +1,4 @@
-regs	(A|B|C|D|E|H|L|M|PWS|SP)
+regs	(A|B|C|D|E|H|L|M|PSW|SP)
 
 /*-------------------------------------------------------*/
 %{
@@ -40,6 +40,7 @@ POP							{return POP;}
 MVI							{return MVI;}
 ADD							{return ADD;}
 SUB							{return SUB;}
+DAA							{return DAA;}
 
 {regs}						{ yylval.text = strdup(yytext);return REG; }
 							

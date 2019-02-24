@@ -29,7 +29,7 @@ void machine_print_mem(int from, int to) {
 	}
 
 	for (int i = from; i <= to; ++i)
-		printf("%d:%o\n", i, proc.mem[i]);
+		printf("%.3o:%.3o\n", i, proc.mem[i]);
 
 }
 
@@ -38,6 +38,8 @@ void machine_print_mem_by_indexes(int indexes[], int indexes_len) {
 		printf("%d:%o\n", indexes[i], proc.mem[OTD(indexes[i])]);
 
 }
+
+
 
 void machine_print_all_reg() {
 	printf("a \t= %o\n", proc.a);
@@ -50,6 +52,7 @@ void machine_print_all_reg() {
 	printf("m \t= %o\n", proc.m);
 	printf("pws\t= %o\n", proc.psw);
 	printf("sp \t= %o\n", proc.sp);
+	printf("f \t= %o\n", proc.f);
 
 }
 
@@ -85,8 +88,8 @@ int machine_get_code_of_reg(char *reg_name) {
 		return L_CODE;
 	else if (!strcmp(reg_name, "M"))
 		return M_CODE;
-	else if (!strcmp(reg_name, "PWS"))
-		return PWS_CODE;
+	else if (!strcmp(reg_name, "PSW"))
+		return PSW_CODE;
 	else if (!strcmp(reg_name, "SP"))
 		return SP_CODE;
 	else
@@ -162,7 +165,7 @@ int machine_get_reg(char *reg_name) {
 		return proc.l;
 	else if (!strcmp(reg_name, "M"))
 		return proc.m;
-	else if (!strcmp(reg_name, "PWS"))
+	else if (!strcmp(reg_name, "PSW"))
 		return proc.psw;
 	else if (!strcmp(reg_name, "SP"))
 		return proc.sp;
@@ -183,6 +186,9 @@ void machine_update_reg_pair(char *reg_name) {
 	} else if (!strcmp(reg_name, "H")) {
 		proc.reg_pair[0] = proc.h;
 		proc.reg_pair[1] = proc.l;
+	} else if (!strcmp(reg_name, "PSW")) {
+		proc.reg_pair[0] = proc.a;
+		proc.reg_pair[1] = proc.f;
 	} else
 		printf("UNDEFINED REG PAIR = %s\n", reg_name);
 
@@ -232,7 +238,8 @@ int OTD(int oct) {
 
 }
 
-void print_inf_8080(int cell_num){
-	printf("%d:%o \t(s = %d, z = %d, a = %d, p = %d, c = %d)\n", cell_num, proc.mem[cell_num],
-					(proc.f>>7)&1,(proc.f>>6)&1,(proc.f>>4)&1,(proc.f>>2)&1,proc.f&1 );
+void print_inf_8080(int cell_num) {
+	printf("%d:%o \t(s = %d, z = %d, a = %d, p = %d, c = %d)\n", cell_num,
+			proc.mem[cell_num], (proc.f >> 7) & 1, (proc.f >> 6) & 1,
+			(proc.f >> 4) & 1, (proc.f >> 2) & 1, proc.f & 1);
 }

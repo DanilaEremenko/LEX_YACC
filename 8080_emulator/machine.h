@@ -24,10 +24,12 @@
 
 struct processor_8086{
 	int mem[MEM_SIZE];
+	int max_sp;
 	int sp;//TODO check
 	int a;//acumul
 	int b,c,d,e,h,l,m;//GPR
 	int pws;//flag register
+	int reg_pair[2];//current pair
 }typedef processor_8086;
 
 void machine_init_processor_8086();

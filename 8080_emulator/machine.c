@@ -116,8 +116,6 @@ void machine_set_reg(char *reg_name, int number) {
 		proc.m = number;
 	else if (!strcmp(reg_name, "PWS"))
 		proc.pws = number;
-	else if (!strcmp(reg_name, "SP"))
-		proc.sp = number;
 	else
 		printf("UNDEFINED REG = %s\n", reg_name);
 
@@ -138,6 +136,7 @@ void machine_set_reg_pair(char *reg_name, int number_1, int number_2) {
 		proc.l = number_2;
 	} else if (!strcmp(reg_name, "SP")) {
 		proc.sp = (number_2 << 8) + number_1;
+		proc.max_sp = proc.sp;
 	} else
 		printf("UNDEFINED REG PAIR = %s\n", reg_name);
 
@@ -174,22 +173,20 @@ int machine_get_reg(char *reg_name) {
 
 }
 
-int *machine_get_reg_pair(char *reg_name) {
-	int result[2];
-
+void machine_update_reg_pair(char *reg_name) {
 	if (!strcmp(reg_name, "B")) {
-		result[0] = proc.b;
-		result[1] = proc.c;
+		proc.reg_pair[0] = proc.b;
+		proc.reg_pair[1] = proc.c;
 	} else if (!strcmp(reg_name, "D")) {
-		result[0] = proc.d;
-		result[1] = proc.e;
+		proc.reg_pair[0] = proc.d;
+		proc.reg_pair[1] = proc.e;
 	} else if (!strcmp(reg_name, "H")) {
-		result[0] = proc.h;
-		result[1] = proc.l;
+		proc.reg_pair[0] = proc.h;
+		proc.reg_pair[1] = proc.l;
 	} else
 		printf("UNDEFINED REG PAIR = %s\n", reg_name);
 
-	return &result;
+	return;
 
 }
 

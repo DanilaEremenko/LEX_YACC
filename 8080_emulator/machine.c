@@ -14,7 +14,7 @@ void machine_init_processor_8086() {
 	proc.h = 0;
 	proc.l = 0;
 	proc.m = 0;
-	proc.pws = 0;
+	proc.psw = 0;
 	proc.sp = 0;
 }
 
@@ -48,7 +48,7 @@ void machine_print_all_reg() {
 	printf("h \t= %o\n", proc.h);
 	printf("l \t= %o\n", proc.l);
 	printf("m \t= %o\n", proc.m);
-	printf("pws\t= %o\n", proc.pws);
+	printf("pws\t= %o\n", proc.psw);
 	printf("sp \t= %o\n", proc.sp);
 
 }
@@ -115,7 +115,7 @@ void machine_set_reg(char *reg_name, int number) {
 	else if (!strcmp(reg_name, "M"))
 		proc.m = number;
 	else if (!strcmp(reg_name, "PWS"))
-		proc.pws = number;
+		proc.psw = number;
 	else
 		printf("UNDEFINED REG = %s\n", reg_name);
 
@@ -163,7 +163,7 @@ int machine_get_reg(char *reg_name) {
 	else if (!strcmp(reg_name, "M"))
 		return proc.m;
 	else if (!strcmp(reg_name, "PWS"))
-		return proc.pws;
+		return proc.psw;
 	else if (!strcmp(reg_name, "SP"))
 		return proc.sp;
 	else
@@ -208,7 +208,7 @@ void machine_add_reg(char *reg_name, int num) {
 	else if (!strcmp(reg_name, "M"))
 		proc.m += num;
 	else if (!strcmp(reg_name, "PWS"))
-		proc.pws += num;
+		proc.psw += num;
 	else if (!strcmp(reg_name, "SP"))
 		proc.sp += num;
 	else
@@ -230,4 +230,9 @@ int OTD(int oct) {
 
 	return dec;
 
+}
+
+void print_inf_8080(int cell_num){
+	printf("%d:%o \t(s = %d, z = %d, a = %d, p = %d, c = %d)\n", cell_num, proc.mem[cell_num],
+					(proc.f>>7)&1,(proc.f>>6)&1,(proc.f>>4)&1,(proc.f>>2)&1,proc.f&1 );
 }

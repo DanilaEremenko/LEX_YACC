@@ -129,14 +129,14 @@ void machine_set_reg(char *reg_name, int number) {
 void machine_set_reg_pair(char *reg_name, int number_1, int number_2) {
 
 	if (!strcmp(reg_name, "B")) {
-		proc.b = number_1;
-		proc.c = number_2;
+		proc.b = number_2;
+		proc.c = number_1;
 	} else if (!strcmp(reg_name, "D")) {
-		proc.d = number_1;
-		proc.e = number_2;
+		proc.d = number_2;
+		proc.e = number_1;
 	} else if (!strcmp(reg_name, "H")) {
-		proc.h = number_1;
-		proc.l = number_2;
+		proc.h = number_2;
+		proc.l = number_1;
 	} else if (!strcmp(reg_name, "SP")) {
 		proc.sp = (number_2 << 8) + number_1;
 		proc.max_sp = proc.sp;

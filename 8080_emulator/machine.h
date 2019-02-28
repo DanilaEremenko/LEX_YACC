@@ -30,6 +30,8 @@
 #define PAR_FLAG	(1<<2)
 #define CARRY_FLAG 	(1<<0)
 
+#define MAX_VAL		0xff
+
 #define MEM_SIZE 1024
 
 struct processor_8086 {

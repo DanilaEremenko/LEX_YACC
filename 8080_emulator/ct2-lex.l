@@ -41,6 +41,9 @@ MVI							{return MVI;}
 ADD							{return ADD;}
 SUB							{return SUB;}
 DAA							{return DAA;}
+ADC							{return ADC;}
+LDA							{return LDA;}
+SBB							{return SBB;}
 
 {regs}						{ yylval.text = strdup(yytext);return REG; }
 							

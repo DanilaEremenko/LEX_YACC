@@ -15,6 +15,15 @@
 %token JNZ
 %token XRA
 %token RAL
+%token JZ
+%token JNC
+%token JC
+%token JPO
+%token JPE
+%token JP
+%token JM
+%token CALL
+%token RET
 %token<text>REG
 %token<ival>NUM
 %token COMMENTS
@@ -84,12 +93,12 @@ line:	NUM ':' LXI REG ';' NUM ':' NUM ';' NUM ':' NUM ';'
 
 |	NUM ':' PUSH REG ';'
 			{
-				printf("%.3o:%.3o\n",OTD($1),(3<<6) | (machine_get_code_of_reg($4)<<3) |  5);
+				printf("%.3o:%.3o\n",OTD($1),(3<<6) | (machine_get_code_of_reg($4)<<3) |  (5 << 0));
 			};
 				
 |	NUM ':' POP REG ';'
 			{
-				printf("%.3o:%.3o\n",OTD($1),(3<<6) | (machine_get_code_of_reg($4)<<3) |  5);
+				printf("%.3o:%.3o\n",OTD($1),(3<<6) | (machine_get_code_of_reg($4)<<3) |  (1 << 0));
 			};
 |	NUM ':' MVI REG ';' NUM ':' NUM ';'
 			{
@@ -130,7 +139,7 @@ line:	NUM ':' LXI REG ';' NUM ':' NUM ';' NUM ':' NUM ';'
 				};			
 |	NUM ':' JNZ	';' NUM ':' NUM ';' NUM ':' NUM ';'
 				{
-					printf("%.3o:%.3o\n", OTD($1), (3 << 6) | (0 << 0) | (2 << 0));
+					printf("%.3o:%.3o\n", OTD($1), (3 << 6) | (0 << 3) | (2 << 0));
 					printf("%.3o:%.3o\n",OTD($5),OTD($7));
 					printf("%.3o:%.3o\n",OTD($9),OTD($11));
 					
@@ -143,6 +152,68 @@ line:	NUM ':' LXI REG ';' NUM ':' NUM ';' NUM ':' NUM ';'
 				{
 					printf("%.3o:%.3o\n", OTD($1), (0 << 6) | (2 << 3) | (7 << 0));
 				}
+				
+|	NUM ':' JZ	';' NUM ':' NUM ';' NUM ':' NUM ';'
+				{
+					printf("%.3o:%.3o\n", OTD($1), (3 << 6) | (1 << 3) | (2 << 0));
+					printf("%.3o:%.3o\n",OTD($5),OTD($7));
+					printf("%.3o:%.3o\n",OTD($9),OTD($11));
+					
+				};
+|	NUM ':' JNC	';' NUM ':' NUM ';' NUM ':' NUM ';'
+				{
+					printf("%.3o:%.3o\n", OTD($1), (3 << 6) | (2 << 3) | (2 << 0));
+					printf("%.3o:%.3o\n",OTD($5),OTD($7));
+					printf("%.3o:%.3o\n",OTD($9),OTD($11));
+					
+				};
+|	NUM ':' JC	';' NUM ':' NUM ';' NUM ':' NUM ';'
+				{
+					printf("%.3o:%.3o\n", OTD($1), (3 << 6) | (3 << 3) | (2 << 0));
+					printf("%.3o:%.3o\n",OTD($5),OTD($7));
+					printf("%.3o:%.3o\n",OTD($9),OTD($11));
+					
+				};
+
+|	NUM ':' JPO	';' NUM ':' NUM ';' NUM ':' NUM ';'
+				{
+					printf("%.3o:%.3o\n", OTD($1), (3 << 6) | (4 << 3) | (2 << 0));
+					printf("%.3o:%.3o\n",OTD($5),OTD($7));
+					printf("%.3o:%.3o\n",OTD($9),OTD($11));
+					
+				};
+|	NUM ':' JPE	';' NUM ':' NUM ';' NUM ':' NUM ';'
+				{
+					printf("%.3o:%.3o\n", OTD($1), (3 << 6) | (5 << 3) | (2 << 0));
+					printf("%.3o:%.3o\n",OTD($5),OTD($7));
+					printf("%.3o:%.3o\n",OTD($9),OTD($11));
+					
+				};
+|	NUM ':' JP	';' NUM ':' NUM ';' NUM ':' NUM ';'
+				{
+					printf("%.3o:%.3o\n", OTD($1), (3 << 6) | (6 << 3) | (2 << 0));
+					printf("%.3o:%.3o\n",OTD($5),OTD($7));
+					printf("%.3o:%.3o\n",OTD($9),OTD($11));
+					
+				};
+|	NUM ':' JM	';' NUM ':' NUM ';' NUM ':' NUM ';'
+				{
+					printf("%.3o:%.3o\n", OTD($1), (3 << 6) | (7 << 3) | (2 << 0));
+					printf("%.3o:%.3o\n",OTD($5),OTD($7));
+					printf("%.3o:%.3o\n",OTD($9),OTD($11));
+					
+				};
+				
+|	NUM ':' CALL ';' NUM ':' NUM ';' NUM ':' NUM ';'
+				{
+					printf("%.3o:%.3o\n", OTD($1), (3 << 6) | (1 << 3) | (5 << 0));
+					printf("%.3o:%.3o\n",OTD($5),OTD($7));
+					printf("%.3o:%.3o\n",OTD($9),OTD($11));
+				};
+|	NUM ':' RET ';'	
+				{
+					printf("%.3o:%.3o\n", OTD($1), (3 << 6) | (1 << 3) | (1 << 0));
+				};
 %%
 
 

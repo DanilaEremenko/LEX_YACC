@@ -48,6 +48,15 @@ DCR							{return DCR;}
 JNZ							{return JNZ;}
 XRA							{return XRA;}
 RAL							{return RAL;}
+JZ							{return JZ;}
+JNC							{return JNC;}
+JC							{return JC;}
+JPO							{return JPO;}
+JPE							{return JPE;}
+JP							{return JP;}
+JM							{return JM;}
+CALL						{return CALL;}
+RET							{return RET;}
 
 {regs}						{ yylval.text = strdup(yytext);return REG; }
 							

@@ -1,0 +1,40 @@
+/*func*/
+000:POP H;		/*HL = &b*/
+001:POP B;		/*B = a, C = F*/		
+002:MOV M, B;	/*&b = a*/
+003:RET;
+
+/*main*/
+004:SUB A;		/*A = 0*/
+005:LXI SP;		/*SP  = 200*/
+006:200;
+007:000;
+010:LXI H;		/*HL = &a*/
+011:202;
+012:000;
+013:ADD M;		/*A = a*/
+014:PUSH PSW;	/*M(SP) = A, M(SP-1) = F*/
+015:LXI B;		/*BC = &b*/
+016:203;		
+017:000;
+020:PUSH B;		/*M(SP-2) = 0, M(SP-3) = 203*/
+021:CALL;		/*func(v1, &v2);*/
+022:HLT;
+202:000;		/*a*/
+203:006;		/*b*/
+
+
+
+/*
+//TRANSLATED PROGRAM
+
+void func (int v1, int *v2){
+	*v2 = v1;
+	return;
+}
+
+int main(){
+	int v1 = 0, v2 = 6;
+	func(v1, &v2);		//v1 = 0, v2 = 0
+}
+*/

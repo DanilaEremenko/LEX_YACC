@@ -46,6 +46,8 @@ LDA							{return LDA;}
 SBB							{return SBB;}
 DCR							{return DCR;}
 JNZ							{return JNZ;}
+XRA							{return XRA;}
+RAL							{return RAL;}
 
 {regs}						{ yylval.text = strdup(yytext);return REG; }
 							

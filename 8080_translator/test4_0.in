@@ -1,19 +1,19 @@
-000:LXI H;		/*from what*/
+000:LXI H;		/*from address*/
 001:022;
 002:000;
-003:LXI B;		/*how many*/
-004:005;
+003:LXI B;		/*how cells will be erased*/
+004:004;
 005:000;
-006:SUB A;
-007:MOV M, A;
-010:INX H;
-011:DEC B;
-012:ADD B;
-013:JNZ;
+006:SUB A;		/*A 	= 0	*/
+007:MOV M, A;	/*M(i) 	= 0	*/
+010:INX H;		/*HL++		*/
+011:DEC B;		/*ctr--		*/
+012:ADD B;		/*A = B		*/
+013:JNZ;		/*B != 0 -> goto 004*/
 014:004;
 015:000;
-016:777;		/*erased area*/
-017:777;
-020:777;
+016:HLT;		
+017:777;		/*erased area*/
+020:777;		
 021:777;
 022:777;

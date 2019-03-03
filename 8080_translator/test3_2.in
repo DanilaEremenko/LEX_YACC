@@ -1,14 +1,14 @@
-000:MVI A;
+000:MVI A;		/* A = 00_010_111 */
 001:027;
-002:MVI B;
+002:MVI B;		/* B = 00_001_000 */
 003:010; 
-004:ADD B;
+004:ADD B;		/* A = 00_011_111 */
 005:LXI SP;
 006:200;
 007:000;
-010:PUSH PSW;	/*37 in 177 before DAA*/
+010:PUSH PSW;	/*M(177) = 37(0001_1111) before DAA*/
 011:DAA;
-012:PUSH PSW;	/*45 in 175 after DAA*/
+012:PUSH PSW;	/*M(175) = 45(0100_0101) after DAA*/
 013:HLT;
 
 

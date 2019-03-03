@@ -13,6 +13,8 @@
 %token SBB
 %token DCR
 %token JNZ
+%token XRA
+%token RAL
 %token<text>REG
 %token<ival>NUM
 %token COMMENTS
@@ -133,7 +135,14 @@ line:	NUM ':' LXI REG ';' NUM ':' NUM ';' NUM ':' NUM ';'
 					printf("%.3o:%.3o\n",OTD($9),OTD($11));
 					
 				};				
-			
+|	NUM ':' XRA REG ';'
+				{
+					printf("%.3o:%.3o\n", OTD($1), (2 << 6) | (5 << 3) | machine_get_code_of_reg($4));
+				}
+|	NUM ':'	RAL ';'
+				{
+					printf("%.3o:%.3o\n", OTD($1), (0 << 6) | (2 << 3) | (7 << 0));
+				}
 %%
 
 

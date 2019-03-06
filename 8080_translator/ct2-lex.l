@@ -57,6 +57,7 @@ JP							{return JP;}
 JM							{return JM;}
 CALL						{return CALL;}
 RET							{return RET;}
+RST							{return RST;}
 
 {regs}						{ yylval.text = strdup(yytext);return REG; }
 							

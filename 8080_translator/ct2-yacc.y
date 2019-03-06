@@ -24,6 +24,7 @@
 %token JM
 %token CALL
 %token RET
+%token RST
 %token<text>REG
 %token<ival>NUM
 %token COMMENTS
@@ -214,6 +215,11 @@ line:	NUM ':' LXI REG ';' NUM ':' NUM ';' NUM ':' NUM ';'
 				{
 					printf("%.3o:%.3o\n", OTD($1), (3 << 6) | (1 << 3) | (1 << 0));
 				};
+|	NUM ':' RST NUM ';'
+				{
+					printf("%.3o:%.3o\n", OTD($1), (3 << 6) | ($4 << 3) | (7 << 0));
+				}
+			
 %%
 
 

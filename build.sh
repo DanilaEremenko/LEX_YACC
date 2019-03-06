@@ -29,7 +29,7 @@ else
 		do
 			testOut=$( echo $testIn | cut -d . -f1 )".out"
 			./a.out <$testIn >$testOut
-			echo -e "\n----------------------\n\t$testIn\n"
+			echo -e "\n--------------------------------------------\n\t$testIn\n"
 			cat $testIn
 			echo -e "\n----------------------\n\t$testOut\n"
 			cat $testOut

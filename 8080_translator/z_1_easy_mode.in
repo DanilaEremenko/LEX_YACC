@@ -111,18 +111,21 @@ dest_addr
 /*STACK
 */
 /*@MAIN-----------------------------------------------*/
-123:LXI B;		/*push destinition address*/
-124:221;
+123:LXI SP;		/*initialize SP*/
+124:200;
 125:000;
-126:PUSH B;
-127:LXI B;		/*push source address*/
-130:201;
-131:000;
-132:PUSH B;
-133:CALL;
-134:050;
-135:000;
-136:HLT;
+126:LXI B;		/*push destinition address*/
+127:221;
+130:000;
+131:PUSH B;
+132:LXI B;		/*push source address*/
+133:201;
+134:000;
+135:PUSH B;
+136:CALL;
+137:050;
+140:000;
+141:HLT;
 
 
 /*MATRIX SOURCE*/

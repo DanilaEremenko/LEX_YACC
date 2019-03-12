@@ -2,16 +2,23 @@
 LXI SP;		/*initialize SP*/
 200;
 000;
-LXI HL;		/*v1 = HL - line element*/
+LXI H;		/*v1 = HL - line element*/
 202;	
 000;
-LXI DE;		/*v2 = DE - row element*/
+LXI D;		/*v2 = DE - row element*/
 205;
 000;
 CALL;		/*@transpose_matrix*/
-050;
+@transpose_matrix;
+@transpose_matrix;
+MVI A;		/*init matrix size*/
+020;
+PUSH PSW;	/*save matrix size*/
+LXI B;		/*index of matrix*/
+201;
 000;
 HLT;
+
 
 /*@transpose_matrix-----------------------------------------------*/
 /*@init_counter*/
@@ -35,6 +42,7 @@ SUB;		/*ctr--*/
 001;
 JZ;			/*IF local_ctr == 0*/
 @update_next_indexes;
+@update_next_indexes;
 
 /*@update_indexes*/
 LXI B;			/*ELSE        -> line_index += 1*/
@@ -53,13 +61,15 @@ POP D;			/*DE = DE + 4*/
 POP H;			/*HL = HL + 1*/
 JMP;
 @exchange_elements;
+@exchange_elements;
 
 /*@update_next_indexes*/
 POP PSW;		/*POP global_ctr*/
 SUB;
 001;
 JZ;				/*repeat if global_ctr != 0*/
-@jump_to_return
+@jump_to_return;
+@jump_to_return;
 POP B;			/*BC = line_index_shift*/
 DAD B;			/*HL = HL + BC*/			
 INX B;			/*line_index_shift++*/
@@ -75,7 +85,9 @@ POP D;			/*DE = HL + 3 + 3*/
 POP H;			/*HL = HL + 3*/
 JMP;
 @exchange_elements;
+@exchange_elements;
 RET;
+
 
 
 /*MATRIX SOURCE

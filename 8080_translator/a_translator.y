@@ -22,9 +22,13 @@
 %token JPE
 %token JP
 %token JM
+%token JMP
 %token CALL
 %token RET
 %token RST
+%token STAX
+%token LDAX
+%token DAD
 %token<text>REG
 %token<ival>NUM
 %token COMMENTS
@@ -115,6 +119,10 @@ line:	NUM ':' LXI REG ';' NUM ':' NUM ';' NUM ':' NUM ';'
 			{	
 				printf("%.3o:%.3o\n",OTD($1),(2 << 6) | (2 << 3) | machine_get_code_of_reg($4));
 			};
+|	NUM ':' SUB ';'
+			{	
+				printf("%.3o:%.3o\n",OTD($1),(3 << 6) | (2 << 3) | (6 << 0));
+			};
 |	NUM ':' DAA ';'
 				{	
 					printf("%.3o:%.3o\n",OTD($1),DAA_OP);
@@ -204,6 +212,13 @@ line:	NUM ':' LXI REG ';' NUM ':' NUM ';' NUM ':' NUM ';'
 					printf("%.3o:%.3o\n",OTD($9),OTD($11));
 					
 				};
+|	NUM ':' JMP	';' NUM ':' NUM ';' NUM ':' NUM ';'
+				{
+					printf("%.3o:%.3o\n", OTD($1), (3 << 6) | (0 << 3) | (3 << 0));
+					printf("%.3o:%.3o\n",OTD($5),OTD($7));
+					printf("%.3o:%.3o\n",OTD($9),OTD($11));
+					
+				};
 				
 |	NUM ':' CALL ';' NUM ':' NUM ';' NUM ':' NUM ';'
 				{
@@ -218,6 +233,18 @@ line:	NUM ':' LXI REG ';' NUM ':' NUM ';' NUM ':' NUM ';'
 |	NUM ':' RST NUM ';'
 				{
 					printf("%.3o:%.3o\n", OTD($1), (3 << 6) | ($4 << 3) | (7 << 0));
+				}
+|	NUM ':'	LDAX REG ';'
+				{
+					printf("%.3o:%.3o\n", OTD($1), (0 << 6) | (1 + (machine_get_code_of_reg($4))) << 3 | (2 << 0));
+				}
+|	NUM ':'	STAX REG ';'
+				{
+					printf("%.3o:%.3o\n", OTD($1), (0 << 6) | (machine_get_code_of_reg($4) << 3) | (2 << 0));
+				}
+|	NUM ':'	DAD REG ';'
+				{
+					printf("%.3o:%.3o\n", OTD($1), (0 << 6) | (1 + machine_get_code_of_reg($4)) << 3 | (1 << 0));
 				}
 			
 %%

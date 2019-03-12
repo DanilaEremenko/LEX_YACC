@@ -55,9 +55,13 @@ JPO							{return JPO;}
 JPE							{return JPE;}
 JP							{return JP;}
 JM							{return JM;}
+JMP							{return JMP;}
 CALL						{return CALL;}
 RET							{return RET;}
 RST							{return RST;}
+LDAX						{return LDAX;}
+STAX						{return STAX;}
+DAD							{return DAD;}
 
 {regs}						{ yylval.text = strdup(yytext);return REG; }
 							

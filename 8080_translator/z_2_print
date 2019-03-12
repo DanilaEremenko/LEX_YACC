@@ -1,0 +1,74 @@
+/*start*/
+MVI C;		/*save arr.size*/
+020;
+PUSH B;		
+LXI B;		/*BC = arr[0]*/
+201;
+000;
+
+/*@vars_init*/
+LXI H;		/*HL = 7-seg code address*/
+221;
+000;
+MOV D;		
+0;
+/*@check_cycle*/
+LDAX B;		/*A = arr[i]*/
+XRA D;
+JZ;			/*if D == arr[i]*/
+@print;
+@print;
+INX H;
+INR D;
+JMP;
+@check_cycle;
+@check_cycle;
+
+
+/*@print*/
+MOV A,M;	/*load 7-seg code to A*/
+OUT;
+port;
+INX B;		/*BC++*/
+POP PSW;	/*check i < arr.size*/
+SUB;
+1;
+PUSH PSW;	
+JNZ;
+@vars_init;
+@vars_init;
+HLT;		/*END*/
+
+
+/*
+221:077;
+222:003;
+223:133;
+224:117;
+225:146;
+226:155;
+227:175;
+230:007;
+231:177;
+232:157;
+*/
+
+
+/*MATRIX SOURCE
+201:1;
+202:1;
+203:1;
+204:1;
+205:2;
+206:2;
+207:2;
+210:2;
+211:3;
+212:3;
+213:3;
+214:3;
+215:4;
+216:4;
+217:4;
+220:4;
+*/

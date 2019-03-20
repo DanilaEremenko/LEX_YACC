@@ -9,7 +9,7 @@
 007:205;
 010:000;
 011:CALL;		/*@transpose_matrix*/
-012:050;
+012:015;
 013:000;
 014:HLT;
 
@@ -42,8 +42,8 @@
 037:001;
 040:000;
 041:DAD B;			/*HL += 1*/
-042:PUSH H;			/*save line index*/
-043:PUSH D;			/*row_index += 4*/
+042:PUSH H;			/*save line_index*/
+043:PUSH D;			/*save row_index*/
 044:POP H;			/*HL = DE*/
 045:LXI B;			
 046:004;		
@@ -64,10 +64,10 @@
 063:105;
 064:000;
 065:POP B;			/*BC = line_index_shift*/
-066:DAD B;			/*HL = HL + BC*/			
+066:DAD B;			/*HL = HL + BC (+3 first time, +4 second time)*/			
 067:INX B;			/*line_index_shift++*/
-070:PUSH PSW;		/*save global_ctr*/
-071:PUSH B;			/*save line_index_shift*/
+070:PUSH B;			/*save line_index_shift*/
+071:PUSH PSW;		/*save global_ctr*/
 072:PUSH H;			/*save line index*/
 073:LXI B;			
 074:003;		

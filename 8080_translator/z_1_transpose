@@ -74,7 +74,7 @@ POP B;			/*BC = line_index_shift*/
 DAD B;			/*HL = HL + BC*/			
 INX B;			/*line_index_shift++*/
 PUSH PSW;		/*save global_ctr*/
-PUSH B;			/*save line_index_shift*/
+PUSH H;			/*save line index*/
 PUSH H;			/*save line index*/
 LXI B;			
 003;		

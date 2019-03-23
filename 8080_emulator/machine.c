@@ -189,22 +189,26 @@ int machine_get_reg(char *reg_name) {
 
 }
 
-void machine_update_reg_pair(char *reg_name) {
-	if (!strcmp(reg_name, "B")) {
+void machine_update_reg_pair(int code) {
+	switch (code) {
+	case B_CODE:
 		proc.reg_pair[0] = proc.b;
 		proc.reg_pair[1] = proc.c;
-	} else if (!strcmp(reg_name, "D")) {
+		break;
+	case D_CODE:
 		proc.reg_pair[0] = proc.d;
 		proc.reg_pair[1] = proc.e;
-	} else if (!strcmp(reg_name, "H")) {
+		break;
+	case H_CODE:
 		proc.reg_pair[0] = proc.h;
 		proc.reg_pair[1] = proc.l;
-	} else if (!strcmp(reg_name, "PSW")) {
-		proc.reg_pair[0] = proc.a;
-		proc.reg_pair[1] = proc.f;
-	} else
-		printf("UNDEFINED REG PAIR = %s\n", reg_name);
+		break;
+	case M_CODE:
+		proc.reg_pair[0] = proc.h;
+		proc.reg_pair[1] = proc.l;
+		break;
 
+	}
 	return;
 
 }
@@ -258,23 +262,104 @@ void print_inf_8080(int cell_num) {
 }
 
 void execute_all() {
+	int verbose = 0;
+
 	for (int pc = 0;; ++pc) {
-		switch (proc.hashs[pc]) {
+		int hash = proc.hashs[pc];
+		int pair;
+
+		switch (hash) {
+
 		case HLT_H:
-			printf("HLT FOUND\n");
+			if (verbose) {
+				printf("----------regs----------\n");
+				machine_print_all_reg();
+
+				/*must be defined manually*/
+				int from[] = { OTD(0), OTD(160) };
+				int to[] = { OTD(20), OTD(200) };
+
+				if (sizeof(from) == sizeof(to))
+					for (int i = 0; i < sizeof(from) / sizeof(int); i++) {
+						printf("----------mem(%o-%o)---------\n", from[i],
+								to[i]);
+						machine_print_mem(from[i], to[i]);
+					}
+
+				printf("----------flags---------\n");
+			}
 			return;
+
 		case LXI_H:
 			machine_set_reg_pair(B2(proc.mem[pc]), proc.mem[pc + 1],
 					proc.mem[pc + 2]);
 			pc += 2;
 			break;
+
 		case MOV_H:
 			set_reg_by_code(B2(proc.mem[pc]), get_reg_by_code(proc.mem[pc]));
 			break;
 
-		default:
-			printf("%o:%o\n", pc, proc.mem[pc]);
+		case PUSH_H:
+			machine_update_reg_pair(B2(proc.mem[pc]));
+			proc.mem[proc.sp - 1] = proc.reg_pair[0];
+			proc.mem[proc.sp - 2] = proc.reg_pair[1];
+			proc.sp -= 2;
+			break;
 
+		case LDA_H:
+			proc.a = (proc.mem[pc + 1] << 8) & proc.mem[pc + 2];
+			proc.a &= MAX_VAL;
+			pc += 2;
+			break;
+
+		case SBB_H:
+			machine_update_reg_pair(B1(proc.mem[pc]));
+			pair = (proc.reg_pair[0] << 8) + proc.reg_pair[1]
+					+ ((proc.f >> 4) & 1);
+			proc.a =
+					((proc.a - pair) > MAX_VAL || (proc.a - pair) < 0) ?
+							MAX_VAL + 1 - pair : proc.a - pair;
+			if (proc.a >= 0)
+				proc.a &= MAX_VAL;
+			break;
+
+		case INX_H:
+			machine_update_reg_pair(B2(proc.mem[pc]));
+			pair = (proc.reg_pair[0] << 8) + proc.reg_pair[1] + 1;
+			machine_set_reg_pair(B2(proc.mem[pc]), proc.reg_pair[0] << 8,
+					proc.reg_pair[1]);
+			break;
+
+		case ADC_H:
+			machine_update_reg_pair(B1(proc.mem[pc]));
+			proc.a += (proc.reg_pair[0] << 8) + proc.reg_pair[1]
+					+ ((proc.f >> 4) & 1);
+			proc.a %= (MAX_VAL + 1);
+			proc.a &= MAX_VAL;
+			break;
+
+		case MVI_H:
+			set_reg_by_code(B2(proc.mem[pc]),proc.mem[pc+1]);
+			pc++;
+			break;
+
+		case ADD_H:
+			proc.f |= ((proc.a & 0xf) + (get_reg_by_code(B1(proc.mem[pc])) & 0xf) > 9)?
+										AC_FLAG:0;
+			proc.a+=get_reg_by_code(B1(proc.mem[pc]));
+			proc.a &= MAX_VAL;
+			break;
+
+		case SUB_H:
+			proc.a-=get_reg_by_code(B1(proc.mem[pc]));
+			proc.a &= MAX_VAL;
+			break;
+
+		default:
+			printf("Undefined opcode: %o:%o (code = %d)\n", pc, proc.mem[pc],
+					hash);
+			return;
 		}
 
 	}

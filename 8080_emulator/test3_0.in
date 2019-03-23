@@ -6,5 +6,5 @@
 005:ADD M;
 006:MOV M, A;
 007:HLT;
-
+END;
 

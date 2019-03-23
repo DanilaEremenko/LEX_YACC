@@ -8,3 +8,4 @@
 007:INX H;
 010:MOV M,C;
 011:HLT;
+END;

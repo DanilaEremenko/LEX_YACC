@@ -2,6 +2,7 @@
 //#define 8080_EMULATOR_MACHINE_H_
 
 #include <stdio.h>
+#include <string.h>
 #include "codes.h"
 
 #define MAX_VAL		0xff

@@ -8,14 +8,14 @@ int yydebug = 0;	/* To trace parser, set yydebug = 1     */
 			/* ... and call yacc with option -d     */
 
 /* You can use "yyerror" for your own messages */
-yyerror (char *s) 
+void yyerror (char *s)
 { 
 	fprintf( stderr, "?-%s\n", s ); 
 }
 
 /* ------ Define starting point ------ */
 
-main () 
+int main ()
 { 
 	return yyparse(); 
 }

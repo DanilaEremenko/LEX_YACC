@@ -44,6 +44,7 @@ DAA							{return DAA;}
 ADC							{return ADC;}
 LDA							{return LDA;}
 SBB							{return SBB;}
+END							{return END;}
 
 {regs}						{ yylval.text = strdup(yytext);return REG; }
 							

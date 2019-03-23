@@ -39,8 +39,6 @@ void machine_print_mem_by_indexes(int indexes[], int indexes_len) {
 
 }
 
-
-
 void machine_print_all_reg() {
 	printf("a \t= %o\n", proc.a);
 	printf("b \t= %o\n", proc.b);
@@ -56,20 +54,83 @@ void machine_print_all_reg() {
 
 }
 
-int machine_get_opcode_of_mnem(char *mnem) {
-	if (!strcmp(mnem, "LXI"))
-		return LXI_OP;
-	else if (!strcmp(mnem, "MOV"))
-		return MOV_OP;
-	else if (!strcmp(mnem, "INX"))
-		return INX_OP;
-	else if (!strcmp(mnem, "HLT"))
-		return HLT_OP;
-	else
-		printf("UNDEFINED MNEMONIC = %s\n", mnem);
-	return -1;
+/*SETTERS*/
+void machine_set_reg_pair(int reg_code, int number_1, int number_2) {
+	switch (reg_code) {
+	case B_CODE:
+		proc.b = number_2;
+		proc.c = number_1;
+		break;
+	case D_CODE:
+		proc.d = number_2;
+		proc.e = number_1;
+		break;
+	case H_CODE:
+		proc.h = number_2;
+		proc.l = number_1;
+		break;
+	case SP_CODE:
+		proc.sp = (number_2 << 8) + number_1;
+		proc.max_sp = proc.sp;
+		break;
+
+	}
+	return;
+
 }
 
+int get_reg_by_code(int code) {
+	switch (code) {
+	case A_CODE:
+		return proc.a;
+
+	case B_CODE:
+		return proc.b;
+
+	case C_CODE:
+		return proc.c;
+
+	case D_CODE:
+		return proc.d;
+
+	case E_CODE:
+		return proc.e;
+
+	case H_CODE:
+		return proc.h;
+
+	case L_CODE:
+		return proc.l;
+
+	case M_CODE:
+		return proc.mem[proc.h << 8 | proc.l];
+
+	}
+
+}
+
+void set_reg_by_code(int code, int val) {
+	switch (code) {
+	case A_CODE:
+		proc.a = val;
+	case B_CODE:
+		proc.b = val;
+	case C_CODE:
+		proc.c = val;
+	case D_CODE:
+		proc.d = val;
+	case E_CODE:
+		proc.e = val;
+	case H_CODE:
+		proc.h = val;
+	case M_CODE:
+		proc.mem[proc.h << 8 | proc.l] = val;
+
+	}
+
+}
+
+/*GETTERS*/
 int machine_get_code_of_reg(char *reg_name) {
 
 	if (!strcmp(reg_name, "A"))
@@ -96,54 +157,6 @@ int machine_get_code_of_reg(char *reg_name) {
 		printf("UNDEFINED REG = %s\n", reg_name);
 
 	return -1;
-
-}
-
-void machine_set_reg(char *reg_name, int number) {
-
-	if (!strcmp(reg_name, "A"))
-		proc.a = number;
-	else if (!strcmp(reg_name, "B"))
-		proc.b = number;
-	else if (!strcmp(reg_name, "C"))
-		proc.c = number;
-	else if (!strcmp(reg_name, "D"))
-		proc.d = number;
-	else if (!strcmp(reg_name, "E"))
-		proc.e = number;
-	else if (!strcmp(reg_name, "H"))
-		proc.h = number;
-	else if (!strcmp(reg_name, "L"))
-		proc.l = number;
-	else if (!strcmp(reg_name, "M"))
-		proc.m = number;
-	else if (!strcmp(reg_name, "PWS"))
-		proc.psw = number;
-	else
-		printf("UNDEFINED REG = %s\n", reg_name);
-
-	return;
-
-}
-
-void machine_set_reg_pair(char *reg_name, int number_1, int number_2) {
-
-	if (!strcmp(reg_name, "B")) {
-		proc.b = number_2;
-		proc.c = number_1;
-	} else if (!strcmp(reg_name, "D")) {
-		proc.d = number_2;
-		proc.e = number_1;
-	} else if (!strcmp(reg_name, "H")) {
-		proc.h = number_2;
-		proc.l = number_1;
-	} else if (!strcmp(reg_name, "SP")) {
-		proc.sp = (number_2 << 8) + number_1;
-		proc.max_sp = proc.sp;
-	} else
-		printf("UNDEFINED REG PAIR = %s\n", reg_name);
-
-	return;
 
 }
 
@@ -242,4 +255,28 @@ void print_inf_8080(int cell_num) {
 	printf("%d:%o \t(s = %d, z = %d, a = %d, p = %d, c = %d)\n", cell_num,
 			proc.mem[cell_num], (proc.f >> 7) & 1, (proc.f >> 6) & 1,
 			(proc.f >> 4) & 1, (proc.f >> 2) & 1, proc.f & 1);
+}
+
+void execute_all() {
+	for (int pc = 0;; ++pc) {
+		switch (proc.hashs[pc]) {
+		case HLT_H:
+			printf("HLT FOUND\n");
+			return;
+		case LXI_H:
+			machine_set_reg_pair(B2(proc.mem[pc]), proc.mem[pc + 1],
+					proc.mem[pc + 2]);
+			pc += 2;
+			break;
+		case MOV_H:
+			set_reg_by_code(B2(proc.mem[pc]), get_reg_by_code(proc.mem[pc]));
+			break;
+
+		default:
+			printf("%o:%o\n", pc, proc.mem[pc]);
+
+		}
+
+	}
+
 }

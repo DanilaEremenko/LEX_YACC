@@ -14,7 +14,7 @@
 %token<text>REG
 %token<ival>NUM
 %token COMMENTS
-
+%token END
 
 %start lines 
 
@@ -46,38 +46,28 @@ extern processor_8086 proc;
 
 lines:	lines line 				{};
 	|	lines COMMENTS			{};
+	|	lines END				{execute_all();}
 	|	line 					{};
 	|	COMMENTS 				{};
+	|	END						{};
 
 
 
 line:	NUM ':' LXI REG ';' NUM ':' NUM ';' NUM ':' NUM ';'		
 				{
 					proc.mem[OTD($1)] =  (machine_get_code_of_reg($4) << 3) | machine_get_opcode_of_mnem("LXI");
+					proc.hashs[OTD($1)] = LXI_H;
 					proc.mem[OTD($6)] = OTD($8);
 					proc.mem[OTD($10)] = OTD($12);
-					machine_set_reg_pair($4,OTD($8),OTD($12));
-					
-					if(verbose)
-						print_inf_8080($1);
-				
 				};
 
 |	NUM ':' MOV REG ',' REG ';'
 				{
-					if(!strcmp($4,"M")){
-						proc.mem[OTD($1)] = (MOV_OP << 6) | 
+						proc.mem[OTD($1)] = (1 << 6) | 
 									   		(machine_get_code_of_reg($4) << 3) |
 									   		machine_get_code_of_reg($6);
-						proc.mem[(proc.h << 8) & proc.l] = machine_get_reg($6);	
-					}
-					else{
-							printf("mov reg reg isn't working\n");
-					}
+						proc.hashs[OTD($1)] = MOV_H;
 					
-					
-					if(verbose)
-						print_inf_8080($1);
 				};
 |	NUM ':' INX REG ';'
 				{
@@ -86,7 +76,6 @@ line:	NUM ':' LXI REG ';' NUM ':' NUM ';' NUM ':' NUM ';'
 					machine_update_reg_pair($4);
 					proc.reg_pair[0]++;
 					proc.reg_pair[1]++;
-					machine_set_reg_pair($4,proc.reg_pair[0],proc.reg_pair[1]);
 					
 					
 					if(verbose)
@@ -138,19 +127,16 @@ line:	NUM ':' LXI REG ';' NUM ':' NUM ';' NUM ':' NUM ';'
 						printf("POP:stack is empty(line:%d)\n", $1);
 					}else{
 						proc.mem[OTD($1)] = (3<<6) | (machine_get_code_of_reg($4)<<3) |  1;
-						machine_set_reg_pair($4, proc.mem[proc.sp+1], proc.mem[proc.sp]);
 						proc.sp+=2;
 					}
 					
-					if(verbose)
-						print_inf_8080($1);
+					
 				};
 |	NUM ':' MVI REG ';' NUM ':' NUM ';'
 				{
 					proc.mem[OTD($1)] = (machine_get_code_of_reg($4)<<3) | 6;
 					proc.mem[OTD($6)]  = OTD($8);
 					
-					machine_set_reg($4,OTD($8));
 					
 					if(verbose)
 						print_inf_8080($1);

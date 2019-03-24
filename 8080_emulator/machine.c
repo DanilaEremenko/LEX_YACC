@@ -282,9 +282,9 @@ void print_inf_8080(int cell_num) {
 }
 
 void execute_all() {
-	int attach_var = 0;
-	while (!attach_var)
-		attach_var = 0;
+//	int attach_var = 0;
+//	while (!attach_var)
+//		attach_var = 0;
 
 	int verbose = 1;
 

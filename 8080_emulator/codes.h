@@ -106,16 +106,6 @@
 
 
 
-
-
-
-
-
-
-#define INX_OP 3
-#define HLT_OP (1<<6) | (6<<3) | (6<<0)
-#define DAA_OP (0<<6) | (4<<3) | (7<<0)
-
 //FLAGS
 #define DEF_FLAG	0xff
 #define SIGN_FLAG 	(1<<7)

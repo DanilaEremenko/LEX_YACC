@@ -22,7 +22,7 @@ else
 		yacc -vtd *.y
 		#lex: option -s to supress default action ECHO
 		lex -s *.l
-		cc *.c
+		cc -g *.c
 	elif [[ $1 = "-e" ]]
 	then
 		for testIn in $(ls | grep "\.in" )

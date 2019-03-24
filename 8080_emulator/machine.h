@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 #include "codes.h"
 
 #define MAX_VAL		0xff

@@ -55,7 +55,7 @@ void machine_print_all_reg() {
 }
 
 /*SETTERS*/
-void machine_set_reg_pair(int reg_code, int number_1, int number_2) {
+void machine_set_reg_pair(int hash,int reg_code, int number_1, int number_2) {
 	switch (reg_code) {
 	case B_CODE:
 		proc.b = number_2;
@@ -69,10 +69,18 @@ void machine_set_reg_pair(int reg_code, int number_1, int number_2) {
 		proc.h = number_2;
 		proc.l = number_1;
 		break;
-	default:
-		proc.sp = (number_2 << 8) + number_1;
-		proc.max_sp = proc.sp;
+	case M_CODE:
+		if (hash == LXI_H){
+			proc.sp = (number_2 << 8) + number_1;
+			proc.max_sp = proc.sp;
+		}
+		else if (hash == POP_H){
+			proc.a = number_2;
+			proc.f = number_1;
+		}
 		break;
+	default:
+		printf("Undefined reg code in machine_set_reg_pair\n");
 
 	}
 	return;
@@ -214,12 +222,11 @@ void machine_update_reg_pair(int code) {
 		proc.reg_pair[1] = proc.l;
 		break;
 	case M_CODE:
-		proc.reg_pair[0] = proc.h;
-		proc.reg_pair[1] = proc.l;
+		proc.reg_pair[0] = proc.a;
+		proc.reg_pair[1] = proc.f;
 		break;
 	default:
 		printf("UNDEFINED REG%d\n", code);
-
 
 	}
 	return;
@@ -275,6 +282,10 @@ void print_inf_8080(int cell_num) {
 }
 
 void execute_all() {
+	int attach_var = 0;
+	while (!attach_var)
+		attach_var = 0;
+
 	int verbose = 1;
 
 	for (int pc = 0;; ++pc) {
@@ -289,8 +300,8 @@ void execute_all() {
 				machine_print_all_reg();
 
 				/*must be defined manually*/
-				int from[] = { OTD(0), OTD(160) };
-				int to[] = { OTD(20), OTD(210) };
+				int from[] = { OTD(0), OTD(170) };
+				int to[] = { OTD(0), OTD(220) };
 
 				if (sizeof(from) == sizeof(to))
 					for (int i = 0; i < sizeof(from) / sizeof(int); i++) {
@@ -304,13 +315,14 @@ void execute_all() {
 			return;
 
 		case LXI_H:
-			machine_set_reg_pair(B2(proc.mem[pc]), proc.mem[pc + 1],
+			machine_set_reg_pair(hash,B2(proc.mem[pc]), proc.mem[pc + 1],
 					proc.mem[pc + 2]);
 			pc += 2;
 			break;
 
 		case MOV_H:
-			set_reg_by_code(B2(proc.mem[pc]), get_reg_by_code(B1(proc.mem[pc])));
+			set_reg_by_code(B2(proc.mem[pc]),
+					get_reg_by_code(B1(proc.mem[pc])));
 			break;
 
 		case PUSH_H:
@@ -322,7 +334,7 @@ void execute_all() {
 
 		case POP_H:
 			machine_update_reg_pair(B2(proc.mem[pc]));
-			machine_set_reg_pair(B2(proc.mem[pc]), proc.mem[proc.sp],
+			machine_set_reg_pair(hash,B2(proc.mem[pc]), proc.mem[proc.sp],
 					proc.mem[proc.sp + 1]);
 			proc.sp += 2;
 			break;
@@ -347,7 +359,13 @@ void execute_all() {
 		case INX_H:
 			machine_update_reg_pair(B2(proc.mem[pc]));
 			pair = (proc.reg_pair[0] << 8) | proc.reg_pair[1] + 1;
-			machine_set_reg_pair(B2(proc.mem[pc]), pair&0xff,(pair >> 8)&0xff);
+			machine_set_reg_pair(hash,B2(proc.mem[pc]), pair & 0xff,
+					(pair >> 8) & 0xff);
+			break;
+
+		case DCR_H:
+			set_reg_by_code(B2(proc.mem[pc]),
+					get_reg_by_code(B2(proc.mem[pc])) - 1);
 			break;
 
 		case ADC_H:
@@ -371,11 +389,18 @@ void execute_all() {
 									0;
 			proc.a += get_reg_by_code(B1(proc.mem[pc]));
 			proc.a &= MAX_VAL;
+			printf("A = %o", proc.a);
 			break;
 
 		case SUB_H:
 			proc.a -= get_reg_by_code(B1(proc.mem[pc]));
 			proc.a &= MAX_VAL;
+			break;
+
+		case SUI_H:
+			proc.a -= proc.mem[pc + 1];
+			proc.a &= MAX_VAL;
+			pc++;
 			break;
 
 		case DAA_H:
@@ -390,6 +415,49 @@ void execute_all() {
 
 			}
 			proc.a &= 0xff;
+			break;
+
+		case JMP_H:
+			pc = (proc.mem[pc + 1] | (proc.mem[pc + 2] << 8)) - 1;
+			break;
+		case JNZ_H:
+			if (proc.a != 0) {
+				printf("JNZ works pc = %o ->", pc);
+				pc = (proc.mem[pc + 1] | (proc.mem[pc + 2] << 8)) - 1;
+				printf("%o\n", pc+1);
+			} else {
+				printf("JNZ not works pc = %o ->", pc);
+				pc += 2;
+				printf("%o\n", pc+1);
+			}
+			break;
+
+		case JZ_H:
+			if (proc.a == 0) {
+				printf("JZ works pc = %o ->", pc);
+				pc = (proc.mem[pc + 1] | (proc.mem[pc + 2] << 8)) - 1;
+				printf("%o\n", pc+1);
+			} else {
+				printf("JZ not works pc = %o ->", pc);
+				pc += 2;
+				printf("%o\n", pc+1);
+			}
+			break;
+
+		case LDAX_H:
+			machine_update_reg_pair(B2(proc.mem[pc]) - 1);
+			proc.a = proc.mem[(proc.reg_pair[0] << 8) | proc.reg_pair[1]];
+			break;
+
+		case STAX_H:
+			machine_update_reg_pair(B2(proc.mem[pc]));
+			proc.mem[(proc.reg_pair[0] << 8) | proc.reg_pair[1]] = proc.a;
+			break;
+
+		case DAD_H:
+			machine_update_reg_pair(B2(proc.mem[pc]) - 1);
+			proc.h += proc.reg_pair[0];
+			proc.l += proc.reg_pair[1];
 			break;
 
 		default:

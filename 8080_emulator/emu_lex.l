@@ -45,6 +45,14 @@ ADC							{return ADC;}
 LDA							{return LDA;}
 SBB							{return SBB;}
 END;						{return END;}
+DCR							{return DCR;}
+JNZ							{return JNZ;}
+LDAX						{return LDAX;}
+STAX						{return STAX;}
+JZ							{return JZ;}
+JMP							{return JMP;}
+DAD							{return DAD;}
+SUI							{return SUI;}
 
 {regs}						{ yylval.text = strdup(yytext);return REG; }
 							

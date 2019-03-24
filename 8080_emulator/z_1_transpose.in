@@ -1,0 +1,102 @@
+/*@MAIN-----------------------------------------------*/
+000:LXI SP;		/*initialize SP*/
+001:200;
+002:000;
+003:LXI H;		/*v1 = HL - line element*/
+004:202;	
+005:000;
+006:LXI D;		/*v2 = DE - row element*/
+007:205;
+010:000;
+
+/*@transpose_matrix-----------------------------------------------*/
+/*@init_counter*/
+011:LXI B;			/*li*/
+012:000;
+013:003;
+014:PUSH B;		/*save line_index_shift*/
+015:MVI A;		
+016:003;			/*ctr_val*/
+017:PUSH PSW;		/*save global_ctr*/
+
+/*@exchange_elements*/
+020:PUSH PSW;	/*save local_ctr = global_ctr*/
+021:MOV A,M;	/*A = v1*/
+022:PUSH PSW;	/*save v1*/
+023:LDAX D;		/*A = v2*/
+024:MOV M,A;	/*&v1 = v2*/
+025:POP PSW;	/*A = v1*/
+026:STAX D;		/*&v2 = v1*/
+
+/*@check_counter*/
+027:POP PSW;	/*get local_ctr*/
+030:SUI;		/*ctr--*/
+031:001;
+032:JZ;			/*IF local_ctr == 0*/
+033:056;
+034:000;
+
+/*@update_indexes*/
+035:LXI B;			/*ELSE        -> line_index += 1*/
+036:001;
+037:000;
+040:DAD B;			/*HL += 1*/
+041:PUSH H;			/*save line_index*/
+042:PUSH D;			/*save row_index*/
+043:POP H;			/*HL = DE*/
+044:LXI B;			
+045:004;		
+046:000;
+047:DAD B;			/*HL += 4*/
+050:PUSH H;			
+051:POP D;			/*DE = DE + 4*/
+052:POP H;			/*HL = HL + 1*/
+053:JMP;
+054:020;
+055:000;
+
+/*@update_next_indexes*/
+056:POP PSW;		/*POP global_ctr*/
+057:SUI;
+060:001;
+061:JZ;				/*repeat if global_ctr != 0*/
+062:104;
+063:000;
+064:POP B;			/*BC = line_index_shift*/
+065:DAD B;			/*HL = HL + BC (+3 first time, +4 second time)*/			
+066:INX B;			/*line_index_shift++*/
+067:PUSH B;			/*save line_index_shift*/
+070:PUSH PSW;		/*save global_ctr*/
+071:PUSH H;			/*save line index*/
+072:LXI B;			
+073:003;		
+074:000;
+075:DAD B;			/*HL += 3*/
+076:PUSH H;			/*save row index*/
+077:POP D;			/*DE = HL + 3 + 3*/
+100:POP H;			/*HL = HL + 3*/
+101:JMP;
+102:020;
+103:000;
+104:HLT;
+
+/*MATRIX SOURCE*/
+105:1;
+106:1;
+107:1;
+110:1;
+111:2;
+112:2;
+113:2;
+114:2;
+115:3;
+116:3;
+117:3;
+120:3;
+121:4;
+122:4;
+123:4;
+124:4;
+
+END;
+

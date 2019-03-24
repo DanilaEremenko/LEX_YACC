@@ -5,7 +5,7 @@
 #
 #       -c	compile files in directory into a.out
 #
-#       -e   	execute a.out <test.in> test.out and print them contents in terminal
+#       -e  execute a.out <*.in >*.out and print contents of *.in & *.out files into terminal sequentially
 
 if [[ $# != 2 ]]
 then

@@ -19,6 +19,13 @@
 %token JMP
 %token DAD
 %token SUI
+%token OUT
+%token ANI
+%token ADI
+%token RRC
+%token RLC
+%token CALL
+%token RET
 %token<text>REG
 %token<ival>NUM
 %token COMMENTS
@@ -184,6 +191,22 @@ line:	NUM ':' LXI REG ';' NUM ':' NUM ';' NUM ':' NUM ';'
 					proc.hashs[OTD($1)] = JMP_H;
 					
 				};
+				
+|	NUM ':' CALL ';' NUM ':' NUM ';' NUM ':' NUM ';'
+				{
+					proc.mem[OTD($1)] = (3 << 6) | (1 << 3) | 5;
+					proc.mem[OTD($5)] = OTD($7);
+					proc.mem[OTD($9)] = OTD($11);
+					proc.hashs[OTD($1)] = CALL_H;
+					
+				};
+				
+|	NUM ':' RET ';'
+				{
+					proc.mem[OTD($1)] = (3 << 6) | (1 << 3) | 1;
+					proc.hashs[OTD($1)] = RET_H;
+					
+				};
 
 |	NUM ':' LDAX  REG ';'
 				{
@@ -205,6 +228,40 @@ line:	NUM ':' LXI REG ';' NUM ':' NUM ';' NUM ':' NUM ';'
 					proc.hashs[OTD($1)] = DAD_H;
 				
 				};
+
+|	NUM	':'	OUT ';' NUM ':' NUM ';'
+				{
+					proc.mem[OTD($1)] = (3<<6) | (2<<3) | 3;
+					proc.mem[OTD($5)] = OTD($7);
+					proc.hashs[OTD($1)] = OUT_H;
+				
+				};
+				
+|	NUM ':' ANI ';' NUM ':' NUM ';'
+				{
+					proc.mem[OTD($1)] = (3<<6) | (4<<3) | 6;
+					proc.mem[OTD($5)] = OTD($7);
+					proc.hashs[OTD($1)] = ANI_H;
+				};
+				
+|	NUM ':' ADI ';' NUM ':' NUM ';'
+				{
+					proc.mem[OTD($1)] = (3<<6) | (0<<3) | 6;
+					proc.mem[OTD($5)] = OTD($7);
+					proc.hashs[OTD($1)] = ADI_H;
+				};
+|	NUM ':' RRC ';'
+				{				
+					proc.mem[OTD($1)] = (0<<6) | (1<<3) | 7;
+					proc.hashs[OTD($1)] = RRC_H;
+				};
+				
+|	NUM ':' RLC ';'
+				{				
+					proc.mem[OTD($1)] = (0<<6) | (0<<3) | 7;
+					proc.hashs[OTD($1)] = RLC_H;
+				};
+				
 				
 |	NUM ':' NUM ';'
 				{

@@ -14,6 +14,16 @@
 #define B2(val)	 (val>>3) & 7
 #define B3(val)	 (val>>6) & 7
 
+#define SSEG_0 (0<<7)|(0<<6)|(1<<5)|(1<<4)|(1<<3)|(1<<2)|(1<<1)|(1<<0)
+#define SSEG_1 (0<<7)|(0<<6)|(0<<5)|(0<<4)|(0<<3)|(1<<2)|(1<<1)|(0<<0)
+#define SSEG_2 (0<<7)|(1<<6)|(0<<5)|(1<<4)|(1<<3)|(0<<2)|(1<<1)|(1<<0)
+#define SSEG_3 (0<<7)|(1<<6)|(0<<5)|(0<<4)|(1<<3)|(1<<2)|(1<<1)|(1<<0)
+#define SSEG_4 (0<<7)|(1<<6)|(1<<5)|(0<<4)|(0<<3)|(1<<2)|(1<<1)|(0<<0)
+#define SSEG_5 (0<<7)|(1<<6)|(1<<5)|(0<<4)|(1<<3)|(1<<2)|(0<<1)|(1<<0)
+#define SSEG_6 (0<<7)|(1<<6)|(1<<5)|(1<<4)|(1<<3)|(1<<2)|(0<<1)|(1<<0)
+#define SSEG_7 (0<<7)|(0<<6)|(0<<5)|(0<<4)|(0<<3)|(1<<2)|(1<<1)|(1<<0)
+
+
 struct processor_8086 {
 	int mem[MEM_SIZE];
 	int hashs[MEM_SIZE];
@@ -25,26 +35,15 @@ struct processor_8086 {
 	int f; //flag register
 	int psw; //TODO check
 	int reg_pair[2]; //current pair
+	int sseg_el[4];
 }typedef processor_8086;
 
-void machine_init_processor_8086();
-
-void machine_print_mem(int from, int to);
-
-void machine_print_all_reg();
-
-int machine_get_opcode_of_mnem(char *mnem);
 
 int machine_get_code_of_reg(char *reg_name);
-
-void machine_set_reg(char *reg_name, int number);
-
 
 int machine_get_reg(char *reg_name);
 
 int OTD(int oct);
-
-void print_inf_8080(int cell_num);
 
 void execute_all();
 

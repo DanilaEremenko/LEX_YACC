@@ -107,12 +107,12 @@
 
 
 //FLAGS
-#define DEF_FLAG	0xff
-#define SIGN_FLAG 	(1<<7)
-#define ZERO_FLAG 	(1<<6)
-#define AC_FLAG		(1<<4)
-#define PAR_FLAG	(1<<2)
-#define CARRY_FLAG 	(1<<0)
+#define FLAG_DEF	0xff
+#define FLAG_SIGN 	(1<<7)
+#define FLAG_ZERO 	(1<<6)
+#define FLAG_AC		(1<<4)
+#define FLAG_PAR	(1<<2)
+#define FLAG_CARRY 	(1<<0)
 
 
 

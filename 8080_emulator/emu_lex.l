@@ -53,6 +53,13 @@ JZ							{return JZ;}
 JMP							{return JMP;}
 DAD							{return DAD;}
 SUI							{return SUI;}
+OUT							{return OUT;}
+ANI 						{return ANI;}
+ADI							{return ADI;}
+RRC							{return RRC;}
+RLC							{return RLC;}
+CALL						{return CALL;}
+RET							{return RET;}
 
 {regs}						{ yylval.text = strdup(yytext);return REG; }
 							

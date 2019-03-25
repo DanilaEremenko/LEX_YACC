@@ -2,22 +2,7 @@
 
 processor_8086 proc;
 
-void machine_init_processor_8086() {
-	for (int i = 0; i < MEM_SIZE; ++i)
-		proc.mem[i] = 0;
-
-	proc.a = 0;
-	proc.b = 0;
-	proc.c = 0;
-	proc.d = 0;
-	proc.e = 0;
-	proc.h = 0;
-	proc.l = 0;
-	proc.m = 0;
-	proc.psw = 0;
-	proc.sp = 0;
-}
-
+/*PRINTS*/
 void machine_print_mem(int from, int to) {
 	if (from < 0) {
 		printf("bad from value = %d\n", from);
@@ -54,8 +39,14 @@ void machine_print_all_reg() {
 
 }
 
+void print_inf_8080(int cell_num) {
+	printf("%d:%o \t(s = %d, z = %d, a = %d, p = %d, c = %d)\n", cell_num,
+			proc.mem[cell_num], (proc.f >> 7) & 1, (proc.f >> 6) & 1,
+			(proc.f >> 4) & 1, (proc.f >> 2) & 1, proc.f & 1);
+}
+
 /*SETTERS*/
-void machine_set_reg_pair(int hash,int reg_code, int number_1, int number_2) {
+void machine_set_reg_pair(int hash, int reg_code, int number_1, int number_2) {
 	switch (reg_code) {
 	case B_CODE:
 		proc.b = number_2;
@@ -70,11 +61,10 @@ void machine_set_reg_pair(int hash,int reg_code, int number_1, int number_2) {
 		proc.l = number_1;
 		break;
 	case M_CODE:
-		if (hash == LXI_H){
+		if (hash == LXI_H) {
 			proc.sp = (number_2 << 8) + number_1;
 			proc.max_sp = proc.sp;
-		}
-		else if (hash == POP_H){
+		} else if (hash == POP_H) {
 			proc.a = number_2;
 			proc.f = number_1;
 		}
@@ -145,6 +135,34 @@ void set_reg_by_code(int code, int val) {
 		return;
 
 	}
+
+}
+
+void machine_add_reg(char *reg_name, int num) {
+	if (!strcmp(reg_name, "A"))
+		proc.a += num;
+	else if (!strcmp(reg_name, "B"))
+		proc.b += num;
+	else if (!strcmp(reg_name, "C"))
+		proc.c += num;
+	else if (!strcmp(reg_name, "D"))
+		proc.d += num;
+	else if (!strcmp(reg_name, "E"))
+		proc.e += num;
+	else if (!strcmp(reg_name, "H"))
+		proc.h += num;
+	else if (!strcmp(reg_name, "L"))
+		proc.l += num;
+	else if (!strcmp(reg_name, "M"))
+		proc.m += num;
+	else if (!strcmp(reg_name, "PWS"))
+		proc.psw += num;
+	else if (!strcmp(reg_name, "SP"))
+		proc.sp += num;
+	else
+		printf("UNDEFINED REG%s\n", reg_name);
+
+	return;
 
 }
 
@@ -233,34 +251,7 @@ void machine_update_reg_pair(int code) {
 
 }
 
-void machine_add_reg(char *reg_name, int num) {
-	if (!strcmp(reg_name, "A"))
-		proc.a += num;
-	else if (!strcmp(reg_name, "B"))
-		proc.b += num;
-	else if (!strcmp(reg_name, "C"))
-		proc.c += num;
-	else if (!strcmp(reg_name, "D"))
-		proc.d += num;
-	else if (!strcmp(reg_name, "E"))
-		proc.e += num;
-	else if (!strcmp(reg_name, "H"))
-		proc.h += num;
-	else if (!strcmp(reg_name, "L"))
-		proc.l += num;
-	else if (!strcmp(reg_name, "M"))
-		proc.m += num;
-	else if (!strcmp(reg_name, "PWS"))
-		proc.psw += num;
-	else if (!strcmp(reg_name, "SP"))
-		proc.sp += num;
-	else
-		printf("UNDEFINED REG%s\n", reg_name);
-
-	return;
-
-}
-
+/*CONVERTERS*/
 int OTD(int oct) {
 	int dec = 0;
 	int mult = 1;
@@ -275,18 +266,87 @@ int OTD(int oct) {
 
 }
 
-void print_inf_8080(int cell_num) {
-	printf("%d:%o \t(s = %d, z = %d, a = %d, p = %d, c = %d)\n", cell_num,
-			proc.mem[cell_num], (proc.f >> 7) & 1, (proc.f >> 6) & 1,
-			(proc.f >> 4) & 1, (proc.f >> 2) & 1, proc.f & 1);
+/*SSEG*/
+int sseg_convert(int num) {
+	switch (num) {
+	case 0:
+		return SSEG_0;
+	case 1:
+		return SSEG_1;
+	case 2:
+		return SSEG_2;
+	case 3:
+		return SSEG_3;
+	case 4:
+		return SSEG_4;
+	case 5:
+		return SSEG_5;
+	case 6:
+		return SSEG_6;
+	case 7:
+		return SSEG_7;
+	}
+	return 0;
 }
 
+void sseg_print(int sseg) {
+
+	if (sseg & 1)
+		printf(" _");
+	printf("\n");
+	/*---------------------------*/
+	if ((sseg >> 5) & 1)
+		printf("|");
+	else
+		printf(" ");
+
+	/*---------------------------*/
+
+	if ((sseg >> 6) & 1)
+		printf("_");
+	else
+		printf(" ");
+	/*---------------------------*/
+
+	if ((sseg >> 1) & 1)
+		printf("|");
+	printf("\n");
+	/*---------------------------*/
+
+	if ((sseg >> 4) & 1)
+		printf("|");
+	else
+		printf(" ");
+	/*---------------------------*/
+
+	if ((sseg >> 3) & 1)
+		printf("_");
+	else
+		printf(" ");
+	/*---------------------------*/
+
+	if ((sseg >> 2) & 1)
+		printf("|");
+	printf("\n");
+
+	/*---------------------------*/
+
+}
+
+/*execute while proc.hashs[pc] != HLT*/
 void execute_all() {
 //	int attach_var = 0;
 //	while (!attach_var)
 //		attach_var = 0;
 
 	int verbose = 1;
+	int ovfl = 0;
+	int stat_ind_allowed = 0;
+	int sseg4, sseg2, sseg1, sseg0;
+	sseg4 = sseg2 = sseg1 = sseg0 = 0xff;
+
+	int prev_hash;
+	int prev_pc;
 
 	for (int pc = 0;; ++pc) {
 		int hash = proc.hashs[pc];
@@ -315,7 +375,7 @@ void execute_all() {
 			return;
 
 		case LXI_H:
-			machine_set_reg_pair(hash,B2(proc.mem[pc]), proc.mem[pc + 1],
+			machine_set_reg_pair(hash, B2(proc.mem[pc]), proc.mem[pc + 1],
 					proc.mem[pc + 2]);
 			pc += 2;
 			break;
@@ -334,7 +394,7 @@ void execute_all() {
 
 		case POP_H:
 			machine_update_reg_pair(B2(proc.mem[pc]));
-			machine_set_reg_pair(hash,B2(proc.mem[pc]), proc.mem[proc.sp],
+			machine_set_reg_pair(hash, B2(proc.mem[pc]), proc.mem[proc.sp],
 					proc.mem[proc.sp + 1]);
 			proc.sp += 2;
 			break;
@@ -359,13 +419,17 @@ void execute_all() {
 		case INX_H:
 			machine_update_reg_pair(B2(proc.mem[pc]));
 			pair = (proc.reg_pair[0] << 8) | proc.reg_pair[1] + 1;
-			machine_set_reg_pair(hash,B2(proc.mem[pc]), pair & 0xff,
+			machine_set_reg_pair(hash, B2(proc.mem[pc]), pair & 0xff,
 					(pair >> 8) & 0xff);
 			break;
 
 		case DCR_H:
 			set_reg_by_code(B2(proc.mem[pc]),
 					get_reg_by_code(B2(proc.mem[pc])) - 1);
+			proc.f &= 0xbf;
+			if (get_reg_by_code(B2(proc.mem[pc])) == 0)
+				proc.f |= FLAG_ZERO;
+
 			break;
 
 		case ADC_H:
@@ -385,7 +449,7 @@ void execute_all() {
 			proc.f |=
 					((proc.a & 0xf) + (get_reg_by_code(B1(proc.mem[pc])) & 0xf)
 							> 9) ?
-					AC_FLAG :
+					FLAG_AC :
 									0;
 			proc.a += get_reg_by_code(B1(proc.mem[pc]));
 			proc.a &= MAX_VAL;
@@ -420,27 +484,28 @@ void execute_all() {
 		case JMP_H:
 			pc = (proc.mem[pc + 1] | (proc.mem[pc + 2] << 8)) - 1;
 			break;
+
 		case JNZ_H:
-			if (proc.a != 0) {
+			if ((proc.f >> 6) & 1 == 0) {
 				printf("JNZ works pc = %o ->", pc);
 				pc = (proc.mem[pc + 1] | (proc.mem[pc + 2] << 8)) - 1;
-				printf("%o\n", pc+1);
+				printf("%o\n", pc + 1);
 			} else {
 				printf("JNZ not works pc = %o ->", pc);
 				pc += 2;
-				printf("%o\n", pc+1);
+				printf("%o\n", pc + 1);
 			}
 			break;
 
 		case JZ_H:
-			if (proc.a == 0) {
+			if ((proc.f >> 6) & 1 != 0) {
 				printf("JZ works pc = %o ->", pc);
 				pc = (proc.mem[pc + 1] | (proc.mem[pc + 2] << 8)) - 1;
-				printf("%o\n", pc+1);
+				printf("%o\n", pc + 1);
 			} else {
 				printf("JZ not works pc = %o ->", pc);
 				pc += 2;
-				printf("%o\n", pc+1);
+				printf("%o\n", pc + 1);
 			}
 			break;
 
@@ -460,12 +525,90 @@ void execute_all() {
 			proc.l += proc.reg_pair[1];
 			break;
 
+		case OUT_H:
+
+			if (proc.mem[pc + 1] == 3 & proc.hashs[pc + 2] == OUT_H
+					& proc.mem[pc + 3] == 7 & proc.a == OTD(200)) {
+
+				printf("%o: success, SI was allowed\n", pc);
+				stat_ind_allowed = 1;
+				pc += 3;
+
+			} else if (stat_ind_allowed) {
+
+				switch (proc.mem[pc + 1]) {
+				case 0:
+					sseg0 = proc.a;
+					break;
+				case 1:
+					sseg1 = proc.a;
+					break;
+				case 2:
+					sseg2 = proc.a;
+					break;
+				case 4:
+					sseg4 = proc.a;
+					break;
+				}
+				printf("------%o:OUT %o (A = %o)\n", pc, proc.mem[pc + 1],
+						proc.a);
+				sseg_print(sseg4);
+				sseg_print(sseg2);
+				sseg_print(sseg1);
+				sseg_print(sseg0);
+				printf("---------------------\n");
+				pc++;
+
+			} else {
+
+				printf("%o: error, SI does't allowed\n", pc);
+				return;
+			}
+			break;
+
+		case ANI_H:
+			proc.a &= proc.mem[pc + 1];
+			pc++;
+			break;
+
+		case ADI_H:
+			proc.a += proc.mem[pc + 1];
+			pc++;
+			break;
+
+		case RRC_H:
+			ovfl = (proc.a & 1) == 1;
+			proc.a = ((proc.a >> 1) | (ovfl << 7)) & 0xff;
+			break;
+
+		case RLC_H:
+			ovfl = ((proc.a >> 7) & 1) == 1;
+			proc.a = ((proc.a << 1) | ovfl) & 0xff;
+			break;
+
+		case CALL_H:
+			proc.mem[proc.sp - 1] = (pc + 3) & 0xff;
+			proc.mem[proc.sp - 2] = ((pc + 3) >> 8) & 0xff;
+			pc = (proc.mem[pc + 1] | (proc.mem[pc + 2] << 8)) - 1;
+			proc.sp -= 2;
+			break;
+
+		case RET_H:
+			pc = (proc.mem[proc.sp] << 8) + proc.mem[proc.sp + 1] - 1;
+			proc.sp += 2;
+			break;
+
 		default:
 			printf("Undefined opcode: %o:%o (code = %d)\n", pc, proc.mem[pc],
 					hash);
+			printf("prev_hash = %o,prev_pc = %o\n\n", prev_hash, prev_pc);
+
 			return;
 		}
+		prev_pc = pc;
+		prev_hash = hash;
+		proc.f |= (proc.a == 0) ? FLAG_ZERO : 0;
 
 	}
-
 }
+

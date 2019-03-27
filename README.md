@@ -1,17 +1,22 @@
 # 8080 EMULATOR GUIDE
 
-USAGE:
+## BUILDING & EXECUTION & CLEANING :
 
-1)compile emulator
+1) Compile emulator
+```
 ./build.sh -c 8080_emulator
-2)execute all *.in files in directory (must be used after compilation) and print result into stdout
+```
+2) Execute all *.in files in directory (must be used only after compilation) and print result to stdout
+```
 ./build.sh -e 8080_emulator
-3)remove all out files in directory
-./build.sh -e 8080_emulator
+```
+3) Remove all out files in directory
+```
+./build.sh -r 8080_emulator
+```
 
-
-________________________________________OUTPUT FILE EXAMPLE___________________________________:
-
+## INPUT FILE EXAMPLE:
+```
 /*@initializing-----------------------------------------------*/
 000:LXI SP;		/*initialize SP*/
 001:200;
@@ -22,17 +27,17 @@ ________________________________________OUTPUT FILE EXAMPLE_____________________
 006:LXI D;		/*DE = address of v2*/
 007:207;
 010:000;
-011:JMP;		/**/
+011:JMP;		/*just test jump*/
 012:021;
 013:000;
 
 /*@exchange v1 <-> v2---------------*/
-021:MOV A,M;	/*A = v1 (&v1 = HL)	*/
+021:MOV A,M;	/*A = v1 (&v1 = HL)		*/
 022:PUSH PSW;	/*save v1			*/
 023:LDAX D;		/*A = v2 (&v2 = DE)	*/
 024:MOV M,A;	/*&v1 = v2			*/
 025:POP PSW;	/*A = v1			*/
-026:STAX D;		/*&v2 = v1			*/
+026:STAX D;		/*&v2 = v1		*/
 027:JMP;
 028:104;
 029:000;
@@ -45,19 +50,20 @@ ________________________________________OUTPUT FILE EXAMPLE_____________________
 207:222;		/*v2*/
 
 /*@Define mem areas which will be printed after executing	*/
-FROM 0 TO 13;		/*binary code of initializing			*/
-FROM 21 TO 29;		/*binary code of exchange v1 <-> v2		*/
-FROM 104 TO 104;	/*binary code of lonelye sad HLT		*/
-FROM 174 TO 200;	/*check stack*/
+FROM 0 TO 13;		/*binary code of initializing		*/
+FROM 21 TO 29;		/*binary code of exchange v1 <-> v2	*/
+FROM 104 TO 104;	/*binary code of lonelye sad HLT	*/
+FROM 174 TO 200;	/*check stack				*/
 FROM 206 TO 207;	/*check that v1 and v2 was exchanged	*/
 
 
 /*@Execute code on emulator. Code will not be executed without this line!*/
 EXEC;			
 
+```
+## OUTPUT FILE EXAMPLE:
 
-________________________________________OUTPUT FILE EXAMPLE___________________________________:
-
+```
 	z_0_example.out
 
 ----------regs----------
@@ -107,6 +113,6 @@ f 	= 100
 206:222
 207:111
 ----------flags---------
-
+```
 
 

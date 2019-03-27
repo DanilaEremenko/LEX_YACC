@@ -334,7 +334,7 @@ void sseg_print(int sseg) {
 }
 
 /*execute while proc.hashs[pc] != HLT*/
-void execute_all() {
+void execute_all(int *from, int *to, int ft_size) {
 //	int attach_var = 0;
 //	while (!attach_var)
 //		attach_var = 0;
@@ -360,13 +360,9 @@ void execute_all() {
 				machine_print_all_reg();
 
 				/*must be defined manually*/
-				int from[] = { OTD(0), OTD(170) };
-				int to[] = { OTD(0), OTD(220) };
 
-				if (sizeof(from) == sizeof(to))
-					for (int i = 0; i < sizeof(from) / sizeof(int); i++) {
-						printf("----------mem(%o-%o)---------\n", from[i],
-								to[i]);
+					for (int i = 0; i < ft_size; i++) {
+						printf("----------mem(%o-%o)---------\n", from[i],to[i]);
 						machine_print_mem(from[i], to[i]);
 					}
 

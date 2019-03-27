@@ -29,7 +29,9 @@
 %token<text>REG
 %token<ival>NUM
 %token COMMENTS
-%token END
+%token EXEC
+%token FROM
+%token TO
 
 
 %start lines 
@@ -48,9 +50,18 @@
 #include <stdio.h>
 #include "machine.h"
 
-int line_number = 0;
-int verbose = 1;
 extern processor_8086 proc;
+
+int line_number = 0;
+
+#define MAX_MEM_AREAS_NUM 10
+
+int from[MAX_MEM_AREAS_NUM];
+int to[MAX_MEM_AREAS_NUM];
+
+int ft_size = 0;
+
+
 
 
 
@@ -62,10 +73,10 @@ extern processor_8086 proc;
 
 lines:	lines line 				{};
 	|	lines COMMENTS			{};
-	|	lines END				{execute_all();}
+	|	lines EXEC				{execute_all(&from[0],&to[0],ft_size);}
 	|	line 					{};
 	|	COMMENTS 				{};
-	|	END						{};
+	|	EXEC					{};
 
 
 
@@ -267,8 +278,20 @@ line:	NUM ':' LXI REG ';' NUM ':' NUM ';' NUM ':' NUM ';'
 				{
 					proc.mem[OTD($1)] = OTD($3);
 				};
+|	FROM NUM TO NUM ';'
+				{
+					if(ft_size < MAX_MEM_AREAS_NUM){
+						from[ft_size] 	= OTD($2);
+						to[ft_size] 	= OTD($4);
+						ft_size++;
+					}else
+						printf("error:trying to print more mem areas that allowed\n");
+				};
 
-				
+
+		
+		
+		
 			
 %%
 

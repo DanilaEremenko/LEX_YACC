@@ -44,7 +44,7 @@ DAA							{return DAA;}
 ADC							{return ADC;}
 LDA							{return LDA;}
 SBB							{return SBB;}
-END;						{return END;}
+EXEC;						{return EXEC;}
 DCR							{return DCR;}
 JNZ							{return JNZ;}
 LDAX						{return LDAX;}
@@ -60,6 +60,8 @@ RRC							{return RRC;}
 RLC							{return RLC;}
 CALL						{return CALL;}
 RET							{return RET;}
+FROM						{return FROM;}
+TO							{return TO;}
 
 {regs}						{ yylval.text = strdup(yytext);return REG; }
 							

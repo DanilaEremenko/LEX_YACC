@@ -32,6 +32,9 @@
 %token EXEC
 %token FROM
 %token TO
+%token ASSERT
+%token T
+%token TEST
 
 
 %start lines 
@@ -51,6 +54,7 @@
 #include "machine.h"
 
 extern processor_8086 proc;
+extern int test_mem[];
 
 int line_number = 0;
 
@@ -60,6 +64,12 @@ int from[MAX_MEM_AREAS_NUM];
 int to[MAX_MEM_AREAS_NUM];
 
 int ft_size = 0;
+
+int tfrom[MAX_MEM_AREAS_NUM];
+int tto[MAX_MEM_AREAS_NUM];
+
+int tft_size = 0;
+
 
 
 
@@ -74,6 +84,7 @@ int ft_size = 0;
 lines:	lines line 				{};
 	|	lines COMMENTS			{};
 	|	lines EXEC				{execute_all(&from[0],&to[0],ft_size);}
+	|	lines TEST				{execute_all(&from[0],&to[0],ft_size); test_all(&tfrom[0],&tto,tft_size);}
 	|	line 					{};
 	|	COMMENTS 				{};
 	|	EXEC					{};
@@ -286,6 +297,25 @@ line:	NUM ':' LXI REG ';' NUM ':' NUM ';' NUM ':' NUM ';'
 						ft_size++;
 					}else
 						printf("error:trying to print more mem areas that allowed\n");
+				};
+
+|	ASSERT NUM NUM ';'
+				{
+				
+					if(ft_size < MAX_MEM_AREAS_NUM){
+						tfrom[tft_size] 	= OTD($2);
+						tto[tft_size] 		= OTD($3);
+						tft_size++;
+					}else
+						printf("error:trying to print more mem areas that allowed\n");
+				
+				
+				};
+
+
+|	T ':' NUM ':' NUM ';'
+				{	
+					test_mem[OTD($3)] = OTD($5);
 				};
 
 

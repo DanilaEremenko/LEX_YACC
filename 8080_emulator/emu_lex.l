@@ -62,6 +62,9 @@ CALL						{return CALL;}
 RET							{return RET;}
 FROM						{return FROM;}
 TO							{return TO;}
+ASSERT						{return ASSERT;}
+T							{return T;}
+TEST;						{return TEST;}
 
 {regs}						{ yylval.text = strdup(yytext);return REG; }
 							

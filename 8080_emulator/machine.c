@@ -2,6 +2,9 @@
 
 processor_8086 proc;
 
+int test_mem[MEM_SIZE];
+
+
 /*PRINTS*/
 void machine_print_mem(int from, int to) {
 	if (from < 0) {
@@ -627,5 +630,28 @@ void execute_all(int *from, int *to, int ft_size) {
 		proc.f |= (proc.a == 0) ? FLAG_ZERO : 0;
 
 	}
+}
+
+
+int test_all(int *from, int *to, int ft_size){
+
+	for (int i = 0; i < ft_size; i++) {
+
+		/*assertions*/
+		assert_8080(from[i] < 0, i, "from[i] < 0");
+		assert_8080(from[i] >= MEM_SIZE, i, "from[i] >= MEM_SIZE");
+		assert_8080(to[i] < 0, i, "to[i] < 0");
+		assert_8080(to[i] >= MEM_SIZE,i, "to[i] >= MEME_SIZE");
+
+		/*print*/
+		printf("----------mem(%o-%o)---------\n", from[i], to[i]);
+		machine_print_mem(from[i], to[i]);
+
+		for (int j = from[i]; j <= to[j]; ++j)
+				assert_8080(proc.mem[j]==test_mem[j],j,"regression test error");
+	}
+
+
+
 }
 

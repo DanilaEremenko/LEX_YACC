@@ -6,7 +6,8 @@
 #       -c	compile files in directory into a.out
 #
 #       -e  execute a.out <*.in >*.out and print contents of *.in & *.out files into terminal sequentially
-
+#
+#		-t  test on *.test files in 8080_emulator/tests directory
 CC="gcc";
 
 if [[ $# != 2 ]]
@@ -36,6 +37,24 @@ else
 			echo -e "\n______________________________\n\t$testOut\n"
 			cat $testOut
 			
+		done
+	elif [[ $1 = "-t" ]]
+	then
+		echo -e "\n______________________TEST MODE________________________\n";
+		cd tests;
+		for testIn in $(ls | grep "\.test" )
+		do
+			testOut=$( echo $testIn | cut -d . -f1 )".out"
+			../a.out <$testIn >/dev/null
+			
+			echo -e "\n________________________________________________________\n";
+			
+			if [[ $? == 0 ]]
+			then		
+				echo "$testIn passed";
+			else
+				echo "$testIn failed with code $?";
+			fi
 		done
 	else
 		echo "Illegal input argument"

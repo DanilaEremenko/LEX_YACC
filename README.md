@@ -10,7 +10,11 @@
 ```
 ./build.sh -e 8080_emulator
 ```
-3) Remove all out files in directory
+3) Run regression tests in 8080_emulator/tests
+```
+./build.sh -t 8080_emulator
+```
+4) Remove all out files
 ```
 ./build.sh -r 8080_emulator
 ```

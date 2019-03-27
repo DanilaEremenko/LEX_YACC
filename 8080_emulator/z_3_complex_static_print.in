@@ -1,26 +1,32 @@
 /*@MAIN-----------------------------------------------*/
 000:MVI B;
 001:000;
+/*@init_SI*/
 002:MVI A;
 003:200;
 004:OUT;
 005:003;
 006:OUT;
 007:007;
+
+/*@init_pointer_on_printed_area*/
 010:LXI H;
 011:200;
 012:000;
 013:MVI D;
 014:004;
+/*@check first 3 bit*/
 015:MOV A,M;
 016:ANI;
-017:007;
-020:ADI;
+017:007;	/*conjunction with mask*/
+020:ADI;	/*A  = &sseg_code(A)*/
 021:300;
-022:MOV C,A;
-023:LDAX B;
+022:MOV C,A;/*BC = &sseg_code(A)*/
+023:LDAX B; /*A = sseg_code(A)  */
 024:OUT;
 025:000;
+
+/*@check second 3 bit*/
 026:MOV A,M;
 027:RRC;
 030:RRC;
@@ -33,6 +39,8 @@
 037:LDAX B;
 040:OUT;
 041:001;
+
+/*@check third 3 bit*/
 042:MOV A,M;
 043:RLC;
 044:RLC;
@@ -44,15 +52,17 @@
 052:LDAX B;
 053:OUT;
 054:002;
+
+/**/
 055:LXI SP;
 056:200;
 057:000;
-060:CALL;
+060:CALL;	/*call decay cycle*/
 061:100;
 062:000;
-063:INX H;
-064:DCR D;
-065:JNZ;
+063:INX H;	/*HL = &next_num*/
+064:DCR D;	/*ctr--*/
+065:JNZ;	/*ctr!=0? -> repeat*/
 066:015;
 067:000;
 070:HLT;
@@ -60,7 +70,7 @@
 072:000;
 
 
-
+/*@decay_cycle : just cycle which neccessary on real device*/
 100:LXI B;
 101:001;
 102:001;
@@ -76,7 +86,7 @@
 
 200:123;
 201:235;
-202:518;
+202:217;
 203:143;
 
 

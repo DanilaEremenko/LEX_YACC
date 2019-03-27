@@ -361,10 +361,10 @@ void execute_all(int *from, int *to, int ft_size) {
 
 				/*must be defined manually*/
 
-					for (int i = 0; i < ft_size; i++) {
-						printf("----------mem(%o-%o)---------\n", from[i],to[i]);
-						machine_print_mem(from[i], to[i]);
-					}
+				for (int i = 0; i < ft_size; i++) {
+					printf("----------mem(%o-%o)---------\n", from[i], to[i]);
+					machine_print_mem(from[i], to[i]);
+				}
 
 				printf("----------flags---------\n");
 			}
@@ -482,24 +482,24 @@ void execute_all(int *from, int *to, int ft_size) {
 			break;
 
 		case JNZ_H:
-			if ((proc.f >> 6) & 1 == 0) {
-				printf("JNZ works pc = %o ->", pc);
+			if (!GET_ZERO_B(proc.f)) {
+				printf("JNZ is working : pc = %o ->", pc);
 				pc = (proc.mem[pc + 1] | (proc.mem[pc + 2] << 8)) - 1;
 				printf("%o\n", pc + 1);
 			} else {
-				printf("JNZ not works pc = %o ->", pc);
+				printf("JNZ isn't working : pc = %o ->", pc);
 				pc += 2;
 				printf("%o\n", pc + 1);
 			}
 			break;
 
 		case JZ_H:
-			if ((proc.f >> 6) & 1 != 0) {
-				printf("JZ works pc = %o ->", pc);
+			if (GET_ZERO_B(proc.f)) {
+				printf("JZ is working : pc = %o ->", pc);
 				pc = (proc.mem[pc + 1] | (proc.mem[pc + 2] << 8)) - 1;
 				printf("%o\n", pc + 1);
 			} else {
-				printf("JZ not works pc = %o ->", pc);
+				printf("JZ isn't working : pc = %o ->", pc);
 				pc += 2;
 				printf("%o\n", pc + 1);
 			}

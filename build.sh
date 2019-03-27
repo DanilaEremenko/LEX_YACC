@@ -19,6 +19,7 @@ else
 	if [[ $1 == "-r" ]]
 	then
 		rm -f out.* y.* *.out lex.yy.c
+		rm tests/*.out
 	elif [[ $1 == "-c" ]]
 	then	
 		rm -f out.* y.* *.out lex.yy.c
@@ -45,16 +46,20 @@ else
 		for testIn in $(ls | grep "\.test" )
 		do
 			testOut=$( echo $testIn | cut -d . -f1 )".out"
-			../a.out <$testIn >/dev/null
-			
-			echo -e "\n________________________________________________________\n";
-			
+			../a.out <$testIn >$testOut
+		
 			if [[ $? == 0 ]]
 			then		
 				echo "$testIn passed";
 			else
 				echo "$testIn failed with code $?";
+				cat $testOut | tail -n1;
 			fi
+			
+			
+			
+			echo -e "\n________________________________________________________\n";
+			
 		done
 	else
 		echo "Illegal input argument"

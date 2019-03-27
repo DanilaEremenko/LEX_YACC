@@ -61,6 +61,6 @@ int OTD(int oct);
 
 void execute_all();
 
-int test_all();
+int test_all(int *from, int *to, int ft_size);
 
 //#endif /* 8080_EMULATOR_MACHINE_H_ */

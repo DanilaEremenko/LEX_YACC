@@ -100,5 +100,5 @@
 
 FROM 0 TO 104;
 FROM 201 TO 220;
-EXEC;
+/*EXEC;*/
 

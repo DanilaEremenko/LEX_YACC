@@ -4,7 +4,6 @@ processor_8086 proc;
 
 int test_mem[MEM_SIZE];
 
-
 /*PRINTS*/
 void machine_print_mem(int from, int to) {
 	if (from < 0) {
@@ -337,9 +336,9 @@ void sseg_print(int sseg) {
 }
 
 void assert_8080(int condition, int addres, char *mess) {
-	if (condition) {
+	if (!condition) {
 		printf("________\n");
-		printf("%d:assertion error, %s, exiting...\n", addres, mess);
+		printf("%o:assertion error, %s, exiting...\n", addres, mess);
 		exit(42);
 	}
 }
@@ -358,11 +357,12 @@ void execute_all(int *from, int *to, int ft_size) {
 
 	int prev_hash;
 	int prev_pc;
+	int old_a;
 
 	for (int pc = 0;; ++pc) {
-
-		assert_8080(pc < 0, pc, "pc < 0");
-		assert_8080(pc >= MEM_SIZE, pc, "pc > MEM_SIZE");
+		old_a = proc.a;
+		assert_8080(pc >= 0, pc, "pc > 0");
+		assert_8080(pc < MEM_SIZE, pc, "pc < MEM_SIZE");
 		int hash = proc.hashs[pc];
 		int pair = 0;
 
@@ -378,10 +378,10 @@ void execute_all(int *from, int *to, int ft_size) {
 				for (int i = 0; i < ft_size; i++) {
 
 					/*assertions*/
-					assert_8080(from[i] < 0, i, "from[i] < 0");
-					assert_8080(from[i] >= MEM_SIZE, i, "from[i] >= MEM_SIZE");
-					assert_8080(to[i] < 0, i, "to[i] < 0");
-					assert_8080(to[i] >= MEM_SIZE,i, "to[i] >= MEME_SIZE");
+					assert_8080(from[i] >= 0, i, "from[i] >= 0");
+					assert_8080(from[i] < MEM_SIZE, i, "from[i] < MEM_SIZE");
+					assert_8080(to[i] >= 0, i, "to[i] >= 0");
+					assert_8080(to[i] < MEM_SIZE, i, "to[i] < MEME_SIZE");
 
 					/*print*/
 					printf("----------mem(%o-%o)---------\n", from[i], to[i]);
@@ -477,6 +477,7 @@ void execute_all(int *from, int *to, int ft_size) {
 		case SUB_H:
 			proc.a -= get_reg_by_code(B1(proc.mem[pc]));
 			proc.a &= MAX_VAL;
+
 			break;
 
 		case SUI_H:
@@ -621,37 +622,40 @@ void execute_all(int *from, int *to, int ft_size) {
 					hash);
 			printf("prev_hash = %o,prev_pc = %o\n\n", prev_hash, prev_pc);
 
-			assert_8080(0,pc, "undefined opcode");
+			assert_8080(0, pc, "undefined opcode");
 
 			return;
 		}
 		prev_pc = pc;
 		prev_hash = hash;
-		proc.f |= (proc.a == 0) ? FLAG_ZERO : 0;
+		if (proc.a == 0 && proc.a != old_a)
+			proc.f |= FLAG_ZERO;
 
 	}
 }
 
-
-int test_all(int *from, int *to, int ft_size){
+int test_all(int *from, int *to, int ft_size) {
+//	int attach_var = 0;
+//	while (!attach_var)
+//		attach_var = 0;
 
 	for (int i = 0; i < ft_size; i++) {
 
 		/*assertions*/
-		assert_8080(from[i] < 0, i, "from[i] < 0");
-		assert_8080(from[i] >= MEM_SIZE, i, "from[i] >= MEM_SIZE");
-		assert_8080(to[i] < 0, i, "to[i] < 0");
-		assert_8080(to[i] >= MEM_SIZE,i, "to[i] >= MEME_SIZE");
+		assert_8080(from[i] >= 0, i, "from[i] > 0");
+		assert_8080(from[i] < MEM_SIZE, i, "from[i] <= MEM_SIZE");
+		assert_8080(to[i] >= 0, i, "to[i] > 0");
+		assert_8080(to[i] < MEM_SIZE, i, "to[i] <= MEME_SIZE");
 
 		/*print*/
 		printf("----------mem(%o-%o)---------\n", from[i], to[i]);
 		machine_print_mem(from[i], to[i]);
 
-		for (int j = from[i]; j <= to[j]; ++j)
-				assert_8080(proc.mem[j]==test_mem[j],j,"regression test error");
+		for (int j = from[i]; j <= to[i]; ++j)
+			assert_8080(proc.mem[j] == test_mem[j], j, "regression test error");
 	}
 
-
+	return 0;
 
 }
 

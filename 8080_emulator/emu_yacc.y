@@ -84,7 +84,7 @@ int tft_size = 0;
 lines:	lines line 				{};
 	|	lines COMMENTS			{};
 	|	lines EXEC				{execute_all(&from[0],&to[0],ft_size);}
-	|	lines TEST				{execute_all(&from[0],&to[0],ft_size); test_all(&tfrom[0],&tto,tft_size);}
+	|	lines TEST				{execute_all(&from[0],&to[0],ft_size); test_all(&tfrom[0],&tto[0],tft_size);}
 	|	line 					{};
 	|	COMMENTS 				{};
 	|	EXEC					{};

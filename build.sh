@@ -7,6 +7,8 @@
 #
 #       -e  execute a.out <*.in >*.out and print contents of *.in & *.out files into terminal sequentially
 
+CC="gcc";
+
 if [[ $# != 2 ]]
 then
 	echo "Illegal number of arguments"
@@ -22,7 +24,7 @@ else
 		yacc -vtd *.y
 		#lex: option -s to supress default action ECHO
 		lex -s *.l
-		cc -g *.c
+		$CC -g *.c
 	elif [[ $1 = "-e" ]]
 	then
 		for testIn in $(ls | grep "\.in" )

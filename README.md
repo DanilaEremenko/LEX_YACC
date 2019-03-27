@@ -45,8 +45,8 @@
 025:POP PSW;	/*A = v1			*/
 026:STAX D;		/*&v2 = v1		*/
 027:JMP;
-028:104;
-029:000;
+030:104;
+031:000;
 
 /*@lonely sad HLT for JMP testing (NOTE:execution of your programs stops when pc = &HLT)*/
 104:HLT;

@@ -15,6 +15,12 @@
 ./build.sh -r 8080_emulator
 ```
 
+## NOTES:
+	-numbers in input file will be perceived as octal
+
+	-numbers in output file will be printed in octal format 
+
+
 ## INPUT FILE EXAMPLE:
 ```
 /*@initializing-----------------------------------------------*/

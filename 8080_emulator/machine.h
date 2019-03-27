@@ -5,6 +5,7 @@
 #include <string.h>
 #include <unistd.h>
 #include "codes.h"
+#include <stdlib.h>
 
 #define MAX_VAL		0xff
 

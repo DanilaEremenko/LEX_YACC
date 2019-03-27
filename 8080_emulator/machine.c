@@ -333,6 +333,14 @@ void sseg_print(int sseg) {
 
 }
 
+void assert_8080(int condition, int addres, char *mess) {
+	if (condition) {
+		printf("________\n");
+		printf("%d:assertion error, %s, exiting...\n", addres, mess);
+		exit(42);
+	}
+}
+
 /*execute while proc.hashs[pc] != HLT*/
 void execute_all(int *from, int *to, int ft_size) {
 //	int attach_var = 0;
@@ -349,6 +357,9 @@ void execute_all(int *from, int *to, int ft_size) {
 	int prev_pc;
 
 	for (int pc = 0;; ++pc) {
+
+		assert_8080(pc < 0, pc, "pc < 0");
+		assert_8080(pc >= MEM_SIZE, pc, "pc > MEM_SIZE");
 		int hash = proc.hashs[pc];
 		int pair = 0;
 
@@ -362,6 +373,14 @@ void execute_all(int *from, int *to, int ft_size) {
 				/*must be defined manually*/
 
 				for (int i = 0; i < ft_size; i++) {
+
+					/*assertions*/
+					assert_8080(from[i] < 0, i, "from[i] < 0");
+					assert_8080(from[i] >= MEM_SIZE, i, "from[i] >= MEM_SIZE");
+					assert_8080(to[i] < 0, i, "to[i] < 0");
+					assert_8080(to[i] >= MEM_SIZE,i, "to[i] >= MEME_SIZE");
+
+					/*print*/
 					printf("----------mem(%o-%o)---------\n", from[i], to[i]);
 					machine_print_mem(from[i], to[i]);
 				}
@@ -598,6 +617,8 @@ void execute_all(int *from, int *to, int ft_size) {
 			printf("Undefined opcode: %o:%o (code = %d)\n", pc, proc.mem[pc],
 					hash);
 			printf("prev_hash = %o,prev_pc = %o\n\n", prev_hash, prev_pc);
+
+			assert_8080(0,pc, "undefined opcode");
 
 			return;
 		}

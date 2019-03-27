@@ -1,0 +1,72 @@
+/*@initializing-----------------------------------------------*/
+000:LXI SP;		/*initialize SP*/
+001:200;
+002:000;
+003:LXI H;		/*HL - addres of  v1*/
+004:206;	
+005:000;
+006:LXI D;		/*DE = address of v2*/
+007:207;
+010:000;
+011:JMP;		/**/
+012:021;
+013:000;
+
+/*@exchange v1 <-> v2---------------*/
+021:MOV A,M;	/*A = v1 (&v1 = HL)	*/
+022:PUSH PSW;	/*save v1			*/
+023:LDAX D;		/*A = v2 (&v2 = DE)	*/
+024:MOV M,A;	/*&v1 = v2			*/
+025:POP PSW;	/*A = v1			*/
+026:STAX D;		/*&v2 = v1			*/
+027:JMP;
+030:104;
+031:000;
+
+/*@lonely sad HLT for JMP testing (NOTE:execution of your programs stops when pc = &HLT)*/
+104:HLT;
+
+/*exchanged variables*/
+206:111;		/*v1*/
+207:222;		/*v2*/
+
+
+
+/*@Execute code on emulator. Code will not be executed without this line!*/
+ASSERT 0 013;
+ASSERT 021 029;		
+ASSERT 104 104;
+ASSERT 206 207;
+
+
+T:000:061;
+T:001:200;
+T:002:000;
+T:003:041;
+T:004:206;
+T:005:000;
+T:006:021;
+T:007:207;
+T:010:000;
+T:011:303;
+T:012:021;
+T:013:000;
+T:021:176;
+T:022:365;
+T:023:032;
+T:024:167;
+T:025:361;
+T:026:022;
+T:027:303;
+T:030:104;
+T:031:000;
+T:104:166;
+T:174:000;
+T:175:000;
+T:176:100;
+T:177:111;
+T:200:000;
+T:206:222;
+T:207:111;
+
+TEST;

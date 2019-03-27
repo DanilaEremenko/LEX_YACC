@@ -1,6 +1,6 @@
 # 8080 EMULATOR GUIDE
 
-## BUILDING & EXECUTION & CLEANING :
+## BUILDING & EXECUTION & TESTING & CLEANING :
 
 1) Compile emulator
 ```
@@ -10,7 +10,11 @@
 ```
 ./build.sh -e 8080_emulator
 ```
-3) Remove all out files in directory
+3) Run regression tests in 8080_emulator/tests
+```
+./build.sh -t 8080_emulator
+```
+4) Remove all out files
 ```
 ./build.sh -r 8080_emulator
 ```
@@ -45,8 +49,8 @@
 025:POP PSW;	/*A = v1			*/
 026:STAX D;		/*&v2 = v1		*/
 027:JMP;
-028:104;
-029:000;
+030:104;
+031:000;
 
 /*@lonely sad HLT for JMP testing (NOTE:execution of your programs stops when pc = &HLT)*/
 104:HLT;

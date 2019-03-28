@@ -28,7 +28,7 @@
 025:300;
 026:MOV C,A;/*BC = &sseg_code(A)*/
 027:LDAX B; /*A = sseg_code(A)  */
-030:PUSH A;		/*save_first_3_bits	*/
+030:PUSH PSW;		/*save_first_3_bits	*/
 
 /*@check_second_3_bits*/
 031:MVI A;
@@ -44,7 +44,7 @@
 043:300;
 044:MOV C,A;
 045:LDAX B;	 /*A = sseg_code(A)  */
-046:PUSH A;		 /*save_second_3_bits	 */
+046:PUSH PSW;		 /*save_second_3_bits	 */
 
 /*@check_third_3_bits*/
 047:MVI A;
@@ -59,7 +59,7 @@
 060:300;
 061:MOV C,A;
 062:LDAX B;
-063:PUSH A;		/*save_third_3_bits	 */
+063:PUSH PSW;		/*save_third_3_bits	 */
 
 
 
@@ -75,8 +75,7 @@
 072:016;
 073:000;
 074:HLT;
-075:010;
-076:000;
+
 
 
 /*@decay_and_printing_cyc just cycle which neccessary on real device*/
@@ -86,28 +85,33 @@
 102:OUT;			/*load to common bus*/
 103:010;
 104:POP PSW;		/*define switch*/
-105:004;
-106:OUT;			/*print*/
-107:011;
-110:LXI B;
-111:001;			/*replace to 000*/
+105:OUT;			/*print*/
+106:011;
+107:MVI A;			/*big decay = A*/
+110:110;
+111:LXI B;
 112:001;			/*replace to 000*/
-113:DCR C;
-114:JNZ;
-115:113;
-116:000;
-117:DCR B;
-120:JNZ;
-121:117;
-122:000;
-123:DCR E;
-124:JNZ;
-125:101;
-126:000;
-127:JMP;	/*JMP to INX H*/
-130:067;
-131:000;
-
+113:001;			/*replace to 000*/
+114:DCR C;
+115:JNZ;
+116:114;
+117:000;
+120:DCR B;
+121:JNZ;
+122:120;
+123:000;
+124:SUI;
+125:001;
+126:JNZ;
+127:111;
+130:000;
+131:DCR E;
+132:JNZ;
+133:101;
+134:000;
+135:JMP;	/*JMP to INX H*/
+136:067;
+137:000;
 
 /*@printed_matrix*/
 200:111;
@@ -139,12 +143,23 @@
 307:007;	/*7*/
 
 
+FROM 0 TO 10;
+FROM 11 TO 15;
 
-/*FROM 0 	 TO 72;
-FROM 100 TO 113;
-FROM 200 TO 203;
-FROM 300 TO 307; 
-*/
+FROM 16 TO 30;
+FROM 31 TO 46;
+FROM 47 TO 63;
+
+FROM 64 TO 76;
+
+FROM 77 TO 137;
+
+FROM 200 TO 217;
+
+FROM 300 TO 307;
+
+
+
 /*EXEC;*/
 
 

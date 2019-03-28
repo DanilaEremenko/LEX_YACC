@@ -71,6 +71,10 @@ void machine_set_reg_pair(int hash, int reg_code, int number_1, int number_2) {
 			proc.f = number_1;
 		}
 		break;
+	case A_CODE:
+		proc.a = number_2;
+		proc.f = number_1;
+		break;
 	default:
 		printf("Undefined reg code in machine_set_reg_pair\n");
 
@@ -140,7 +144,7 @@ void set_reg_by_code(int code, int val) {
 
 }
 
-void machine_add_reg(char *reg_name, int num) {
+void machine_add_reg(char *reg_name, int num, int pc) {
 	if (!strcmp(reg_name, "A"))
 		proc.a += num;
 	else if (!strcmp(reg_name, "B"))
@@ -157,7 +161,7 @@ void machine_add_reg(char *reg_name, int num) {
 		proc.l += num;
 	else if (!strcmp(reg_name, "M"))
 		proc.m += num;
-	else if (!strcmp(reg_name, "PWS"))
+	else if (!strcmp(reg_name, "PSW"))
 		proc.psw += num;
 	else if (!strcmp(reg_name, "SP"))
 		proc.sp += num;
@@ -227,7 +231,7 @@ int machine_get_reg(char *reg_name) {
 
 }
 
-void machine_update_reg_pair(int code) {
+void machine_update_reg_pair(int code, int pc) {
 	switch (code) {
 	case B_CODE:
 		proc.reg_pair[0] = proc.b;
@@ -245,8 +249,12 @@ void machine_update_reg_pair(int code) {
 		proc.reg_pair[0] = proc.a;
 		proc.reg_pair[1] = proc.f;
 		break;
+	case A_CODE:
+		proc.reg_pair[0] = proc.a;
+		proc.reg_pair[1] = proc.f;
+		break;
 	default:
-		printf("UNDEFINED REG%d\n", code);
+		printf("%o:UNDEFINED REG%d\n", code, pc);
 
 	}
 	return;
@@ -350,14 +358,26 @@ void execute_all(int *from, int *to, int ft_size) {
 //		attach_var = 0;
 
 	int verbose = 1;
+
+	/*for flags*/
 	int ovfl = 0;
+	int old_a;
+	int var;
+
+	/*static indication*/
 	int stat_ind_allowed = 0;
+
+	/*dynamic indication*/
+	int dyn_ind_allowed = 0;
+	int current_bus_code = 0;
+
+	/*static_indication fields*/
 	int sseg4, sseg2, sseg1, sseg0;
 	sseg4 = sseg2 = sseg1 = sseg0 = 0xff;
 
+	/*for debug*/
 	int prev_hash;
 	int prev_pc;
-	int old_a;
 
 	for (int pc = 0;; ++pc) {
 		old_a = proc.a;
@@ -404,16 +424,28 @@ void execute_all(int *from, int *to, int ft_size) {
 			break;
 
 		case PUSH_H:
-			machine_update_reg_pair(B2(proc.mem[pc]));
+			var = B2(proc.mem[pc]);
+			if (var == 6) {
+				machine_update_reg_pair(7, pc);
+//				printf("%o:PUSH PSW, A = %o %o\n", pc,proc.a,proc.reg_pair[0]);
+			} else
+				machine_update_reg_pair(B2(proc.mem[pc]), pc);
 			proc.mem[proc.sp - 1] = proc.reg_pair[0];
 			proc.mem[proc.sp - 2] = proc.reg_pair[1];
 			proc.sp -= 2;
 			break;
 
 		case POP_H:
-			machine_update_reg_pair(B2(proc.mem[pc]));
-			machine_set_reg_pair(hash, B2(proc.mem[pc]), proc.mem[proc.sp],
-					proc.mem[proc.sp + 1]);
+			machine_update_reg_pair(B2(proc.mem[pc]), pc);
+			var = B2(proc.mem[pc]);
+			if (var == 6) {
+//				printf("%o:POP PSW, A = %o\n", pc,proc.reg_pair[0]);
+				machine_set_reg_pair(hash, 7,
+						proc.mem[proc.sp], proc.mem[proc.sp + 1]);
+			} else {
+				machine_set_reg_pair(hash, B2(proc.mem[pc]), proc.mem[proc.sp],
+						proc.mem[proc.sp + 1]);
+			}
 			proc.sp += 2;
 			break;
 
@@ -424,7 +456,7 @@ void execute_all(int *from, int *to, int ft_size) {
 			break;
 
 		case SBB_H:
-			machine_update_reg_pair(B1(proc.mem[pc]));
+			machine_update_reg_pair(B1(proc.mem[pc]), pc);
 			pair = (proc.reg_pair[0] << 8) + proc.reg_pair[1]
 					+ ((proc.f >> 4) & 1);
 			proc.a =
@@ -435,7 +467,7 @@ void execute_all(int *from, int *to, int ft_size) {
 			break;
 
 		case INX_H:
-			machine_update_reg_pair(B2(proc.mem[pc]));
+			machine_update_reg_pair(B2(proc.mem[pc]), pc);
 			pair = (proc.reg_pair[0] << 8) | proc.reg_pair[1] + 1;
 			machine_set_reg_pair(hash, B2(proc.mem[pc]), pair & 0xff,
 					(pair >> 8) & 0xff);
@@ -451,7 +483,7 @@ void execute_all(int *from, int *to, int ft_size) {
 			break;
 
 		case ADC_H:
-			machine_update_reg_pair(B1(proc.mem[pc]));
+			machine_update_reg_pair(B1(proc.mem[pc]), pc);
 			proc.a += (proc.reg_pair[0] << 8) + proc.reg_pair[1]
 					+ ((proc.f >> 4) & 1);
 			proc.a %= (MAX_VAL + 1);
@@ -501,7 +533,9 @@ void execute_all(int *from, int *to, int ft_size) {
 			break;
 
 		case JMP_H:
+			printf("JMP is working : pc = %o ->", pc);
 			pc = (proc.mem[pc + 1] | (proc.mem[pc + 2] << 8)) - 1;
+			printf("%o\n", pc + 1);
 			break;
 
 		case JNZ_H:
@@ -529,29 +563,35 @@ void execute_all(int *from, int *to, int ft_size) {
 			break;
 
 		case LDAX_H:
-			machine_update_reg_pair(B2(proc.mem[pc]) - 1);
+			machine_update_reg_pair(B2(proc.mem[pc]) - 1, pc);
 			proc.a = proc.mem[(proc.reg_pair[0] << 8) | proc.reg_pair[1]];
 			break;
 
 		case STAX_H:
-			machine_update_reg_pair(B2(proc.mem[pc]));
+			machine_update_reg_pair(B2(proc.mem[pc]), pc);
 			proc.mem[(proc.reg_pair[0] << 8) | proc.reg_pair[1]] = proc.a;
 			break;
 
 		case DAD_H:
-			machine_update_reg_pair(B2(proc.mem[pc]) - 1);
+			machine_update_reg_pair(B2(proc.mem[pc]) - 1, pc);
 			proc.h += proc.reg_pair[0];
 			proc.l += proc.reg_pair[1];
 			break;
 
 		case OUT_H:
-
+			/*check SI allowed*/
 			if (proc.mem[pc + 1] == 3 & proc.hashs[pc + 2] == OUT_H
 					& proc.mem[pc + 3] == 7 & proc.a == OTD(200)) {
 
 				printf("%o: success, SI was allowed\n", pc);
 				stat_ind_allowed = 1;
 				pc += 3;
+
+				/*check DI allowed*/
+			} else if (proc.mem[pc + 1] == OTD(13) & proc.a == OTD(200)) {
+				printf("%o: success, DI was allowed\n", pc);
+				dyn_ind_allowed = 1;
+				pc += 1;
 
 			} else if (stat_ind_allowed) {
 
@@ -578,6 +618,17 @@ void execute_all(int *from, int *to, int ft_size) {
 				printf("---------------------\n");
 				pc++;
 
+			} else if (dyn_ind_allowed) {
+				if (proc.mem[pc + 1] == OTD(010)) {/*OUT 010;*/
+					current_bus_code = proc.a;
+					pc++;
+				} else if (proc.mem[pc + 1] == OTD(011)) {/*OUT 011;*/
+					printf("------%o:DYN_OUT %o (code = %o, indic = %o)\n", pc,
+							proc.mem[pc + 1], current_bus_code, proc.a);
+					sseg_print(current_bus_code);
+					pc += 1;
+				}
+
 			} else {
 
 				printf("%o: error, SI does't allowed\n", pc);
@@ -592,6 +643,7 @@ void execute_all(int *from, int *to, int ft_size) {
 
 		case ADI_H:
 			proc.a += proc.mem[pc + 1];
+//			printf("ADI A = %o\n",proc.a);
 			pc++;
 			break;
 
@@ -634,6 +686,7 @@ void execute_all(int *from, int *to, int ft_size) {
 	}
 }
 
+/*run regressive tests*/
 int test_all(int *from, int *to, int ft_size) {
 //	int attach_var = 0;
 //	while (!attach_var)

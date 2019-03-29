@@ -8,6 +8,7 @@
 #include <stdlib.h>
 
 #define MAX_VAL		0xff
+#define MIN_VAL		0
 
 #define MEM_SIZE 1024
 

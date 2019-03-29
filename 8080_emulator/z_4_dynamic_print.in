@@ -4,12 +4,12 @@
 002:OUT;
 003:013;
 
-/*@BIG_CYCLE
-004 MVI D;
-005:000;
+/*@BIG_CYCLE*/
+004:MVI D;	/*delay (replace to 000 on real device)*/
+005:001;	
 /*@print number_1*/
-006:MVI B;	/*cycle for people*/
-007:000;
+006:MVI B;	/*delay (replace to 000 on real device)*/
+007:001;
 010:MVI A;	/*load sseg*/
 011:117;
 012:OUT; 	/*load to common bus*/
@@ -23,8 +23,8 @@
 022:010;
 023:000;
 /*@print number_2*/
-024:MVI C;	/*cycle for people*/
-025:000;
+024:MVI C;	/*delay (replace to 000 on real device)*/
+025:001;
 026:MVI A;	/*load sseg*/
 027:133;
 030:OUT;	/*load to common bus*/
@@ -39,8 +39,8 @@
 041:000;
 
 /*@print number_3*/
-042:MVI E;	/*cycle for people*/
-043:000;
+042:MVI E;	/*delay (replace to 000 on real device)*/
+043:001;
 044:MVI A;	/*load sseg*/
 045:077;
 046:OUT;	/*load to common bus*/
@@ -55,8 +55,8 @@
 057:000;
 
 /*@print number_4*/
-060:MVI H;	/*cycle for people*/
-061:000;
+060:MVI H;	/*delay (replace to 000 on real device)*/
+061:001;	
 062:MVI A;	/*load sseg*/
 063:077;
 064:OUT;

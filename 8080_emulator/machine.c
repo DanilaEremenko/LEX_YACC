@@ -342,13 +342,18 @@ void sseg_print(int sseg) {
 	/*---------------------------*/
 
 }
-
+/*TESTS*/
 void assert_8080(int condition, int addres, char *mess) {
 	if (!condition) {
 		printf("________\n");
 		printf("%o:assertion error, %s, exiting...\n", addres, mess);
 		exit(42);
 	}
+}
+
+void assert_val_8080(int val,int pc){
+	assert_8080(val <= MAX_VAL,pc,"proc.mem[pc] > MAX_VAL");
+	assert_8080(val >= MIN_VAL,pc,"proc.mem[pc] > MAX_VAL");
 }
 
 /*execute while proc.hashs[pc] != HLT*/
@@ -373,7 +378,7 @@ void execute_all(int *from, int *to, int ft_size) {
 
 	/*static_indication fields*/
 	int sseg4, sseg2, sseg1, sseg0;
-	sseg4 = sseg2 = sseg1 = sseg0 = 0xff;
+	sseg4 = sseg2 = sseg1 = sseg0 = MAX_VAL;
 
 	/*for debug*/
 	int prev_hash;
@@ -381,8 +386,14 @@ void execute_all(int *from, int *to, int ft_size) {
 
 	for (int pc = 0;; ++pc) {
 		old_a = proc.a;
-		assert_8080(pc >= 0, pc, "pc > 0");
-		assert_8080(pc < MEM_SIZE, pc, "pc < MEM_SIZE");
+
+		/*stay sane*/
+		assert_8080(pc >= 0, pc, "pc < 0");
+		assert_8080(pc < MEM_SIZE, pc, "pc > MEM_SIZE");
+		assert_val_8080(proc.mem[pc],pc);
+
+
+		/*for debug*/
 		int hash = proc.hashs[pc];
 		int pair = 0;
 
@@ -413,6 +424,10 @@ void execute_all(int *from, int *to, int ft_size) {
 			return;
 
 		case LXI_H:
+			/*stay_sane*/
+			assert_val_8080(proc.mem[pc+1],pc+1);
+			assert_val_8080(proc.mem[pc+2],pc+2);
+
 			machine_set_reg_pair(hash, B2(proc.mem[pc]), proc.mem[pc + 1],
 					proc.mem[pc + 2]);
 			pc += 2;
@@ -425,8 +440,8 @@ void execute_all(int *from, int *to, int ft_size) {
 
 		case PUSH_H:
 			var = B2(proc.mem[pc]);
-			if (var == 6) {
-				machine_update_reg_pair(7, pc);
+			if (var == A_CODE-1) {
+				machine_update_reg_pair(A_CODE, pc);
 //				printf("%o:PUSH PSW, A = %o %o\n", pc,proc.a,proc.reg_pair[0]);
 			} else
 				machine_update_reg_pair(B2(proc.mem[pc]), pc);
@@ -469,8 +484,8 @@ void execute_all(int *from, int *to, int ft_size) {
 		case INX_H:
 			machine_update_reg_pair(B2(proc.mem[pc]), pc);
 			pair = (proc.reg_pair[0] << 8) | proc.reg_pair[1] + 1;
-			machine_set_reg_pair(hash, B2(proc.mem[pc]), pair & 0xff,
-					(pair >> 8) & 0xff);
+			machine_set_reg_pair(hash, B2(proc.mem[pc]), pair & MAX_VAL,
+					(pair >> 8) & MAX_VAL);
 			break;
 
 		case DCR_H:
@@ -529,7 +544,7 @@ void execute_all(int *from, int *to, int ft_size) {
 				proc.a += 0x60;
 
 			}
-			proc.a &= 0xff;
+			proc.a &= MAX_VAL;
 			break;
 
 		case JMP_H:
@@ -649,17 +664,17 @@ void execute_all(int *from, int *to, int ft_size) {
 
 		case RRC_H:
 			ovfl = (proc.a & 1) == 1;
-			proc.a = ((proc.a >> 1) | (ovfl << 7)) & 0xff;
+			proc.a = ((proc.a >> 1) | (ovfl << 7)) & MAX_VAL;
 			break;
 
 		case RLC_H:
 			ovfl = ((proc.a >> 7) & 1) == 1;
-			proc.a = ((proc.a << 1) | ovfl) & 0xff;
+			proc.a = ((proc.a << 1) | ovfl) & MAX_VAL;
 			break;
 
 		case CALL_H:
-			proc.mem[proc.sp - 1] = (pc + 3) & 0xff;
-			proc.mem[proc.sp - 2] = ((pc + 3) >> 8) & 0xff;
+			proc.mem[proc.sp - 1] = (pc + 3) & MAX_VAL;
+			proc.mem[proc.sp - 2] = ((pc + 3) >> 8) & MAX_VAL;
 			pc = (proc.mem[pc + 1] | (proc.mem[pc + 2] << 8)) - 1;
 			proc.sp -= 2;
 			break;

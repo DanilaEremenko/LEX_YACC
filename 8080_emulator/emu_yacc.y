@@ -52,6 +52,7 @@
 %{
 #include <stdio.h>
 #include "machine.h"
+#include "y.tab.h"
 
 extern processor_8086 proc;
 extern int test_mem[];

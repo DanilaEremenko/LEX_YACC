@@ -1,0 +1,33 @@
+000:LXI B;
+001:000;
+002:000;
+003:DCR B;
+004:DCR C;
+005:JMP;
+006:050;
+007:000;
+
+
+/*TODO add more tests*/
+
+
+050:LXI SP;
+051:200;
+052:000;
+053:PUSH B;
+054:HLT;
+
+
+
+/*TODO add more tests*/
+ASSERT 176 177;
+
+
+/*TODO add more tests*/
+T:176:377;
+T:177:377;
+
+TEST;
+
+
+

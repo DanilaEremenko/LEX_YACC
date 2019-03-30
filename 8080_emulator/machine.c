@@ -4,7 +4,7 @@ processor_8086 proc;
 
 int test_mem[MEM_SIZE];
 
-/*PRINTS*/
+/*PRINTS--------------------------------------------*/
 void machine_print_mem(int from, int to) {
 	if (from < 0) {
 		printf("bad from value = %d\n", from);
@@ -47,7 +47,7 @@ void print_inf_8080(int cell_num) {
 			(proc.f >> 4) & 1, (proc.f >> 2) & 1, proc.f & 1);
 }
 
-/*SETTERS*/
+/*SETTERS-------------------------------------------*/
 void machine_set_reg_pair(int hash, int reg_code, int number_1, int number_2) {
 	switch (reg_code) {
 	case B_CODE:
@@ -172,7 +172,7 @@ void machine_add_reg(char *reg_name, int num, int pc) {
 
 }
 
-/*GETTERS*/
+/*GETTERS-------------------------------------------*/
 int machine_get_code_of_reg(char *reg_name) {
 
 	if (!strcmp(reg_name, "A"))
@@ -261,7 +261,7 @@ void machine_update_reg_pair(int code, int pc) {
 
 }
 
-/*CONVERTERS*/
+/*CONVERTERS----------------------------------------*/
 int OTD(int oct) {
 	int dec = 0;
 	int mult = 1;
@@ -276,7 +276,7 @@ int OTD(int oct) {
 
 }
 
-/*SSEG*/
+/*SSEG----------------------------------------------*/
 int sseg_convert(int num) {
 	switch (num) {
 	case 0:
@@ -342,7 +342,7 @@ void sseg_print(int sseg) {
 	/*---------------------------*/
 
 }
-/*TESTS*/
+/*TESTS---------------------------------------------*/
 void assert_8080(int condition, int addres, char *mess) {
 	if (!condition) {
 		printf("________\n");
@@ -351,9 +351,46 @@ void assert_8080(int condition, int addres, char *mess) {
 	}
 }
 
-void assert_val_8080(int val,int pc){
-	assert_8080(val <= MAX_VAL,pc,"proc.mem[pc] > MAX_VAL");
-	assert_8080(val >= MIN_VAL,pc,"proc.mem[pc] > MAX_VAL");
+void test_assert_8080(int expected, int val, int addres,char *mess) {
+	if (expected!=val) {
+		printf("________\n");
+		printf("%o:assertion error, val = %o, expected = %o, %s, exiting...\n", addres,val,expected, mess);
+		exit(42);
+	}
+}
+void assert_val_8080(int val, int pc) {
+	assert_8080(val <= MAX_VAL, pc, "proc.mem[pc] > MAX_VAL");
+	assert_8080(val >= MIN_VAL, pc, "proc.mem[pc] > MAX_VAL");
+}
+
+/*MAIN PART-----------------------------------------*/
+int fix_reg_overflow(int reg_code) {
+	int ovfl = 0;
+	switch (reg_code) {
+	case A_CODE:
+		FIX_OVFL(proc.a,ovfl);
+		break;
+	case B_CODE:
+		FIX_OVFL(proc.b,ovfl);
+		break;
+	case C_CODE:
+		FIX_OVFL(proc.c,ovfl);
+		break;
+	case D_CODE:
+		FIX_OVFL(proc.d,ovfl);
+		break;
+	case E_CODE:
+		FIX_OVFL(proc.e,ovfl);
+		break;
+	case H_CODE:
+		FIX_OVFL(proc.h,ovfl);
+		break;
+	case L_CODE:
+		FIX_OVFL(proc.l,ovfl);
+		break;
+	}
+	return ovfl;
+
 }
 
 /*execute while proc.hashs[pc] != HLT*/
@@ -390,8 +427,7 @@ void execute_all(int *from, int *to, int ft_size) {
 		/*stay sane*/
 		assert_8080(pc >= 0, pc, "pc < 0");
 		assert_8080(pc < MEM_SIZE, pc, "pc > MEM_SIZE");
-		assert_val_8080(proc.mem[pc],pc);
-
+		assert_val_8080(proc.mem[pc], pc);
 
 		/*for debug*/
 		int hash = proc.hashs[pc];
@@ -425,8 +461,8 @@ void execute_all(int *from, int *to, int ft_size) {
 
 		case LXI_H:
 			/*stay_sane*/
-			assert_val_8080(proc.mem[pc+1],pc+1);
-			assert_val_8080(proc.mem[pc+2],pc+2);
+			assert_val_8080(proc.mem[pc + 1], pc + 1);
+			assert_val_8080(proc.mem[pc + 2], pc + 2);
 
 			machine_set_reg_pair(hash, B2(proc.mem[pc]), proc.mem[pc + 1],
 					proc.mem[pc + 2]);
@@ -440,7 +476,7 @@ void execute_all(int *from, int *to, int ft_size) {
 
 		case PUSH_H:
 			var = B2(proc.mem[pc]);
-			if (var == A_CODE-1) {
+			if (var == A_CODE - 1) {
 				machine_update_reg_pair(A_CODE, pc);
 //				printf("%o:PUSH PSW, A = %o %o\n", pc,proc.a,proc.reg_pair[0]);
 			} else
@@ -455,8 +491,8 @@ void execute_all(int *from, int *to, int ft_size) {
 			var = B2(proc.mem[pc]);
 			if (var == 6) {
 //				printf("%o:POP PSW, A = %o\n", pc,proc.reg_pair[0]);
-				machine_set_reg_pair(hash, 7,
-						proc.mem[proc.sp], proc.mem[proc.sp + 1]);
+				machine_set_reg_pair(hash, 7, proc.mem[proc.sp],
+						proc.mem[proc.sp + 1]);
 			} else {
 				machine_set_reg_pair(hash, B2(proc.mem[pc]), proc.mem[proc.sp],
 						proc.mem[proc.sp + 1]);
@@ -465,8 +501,8 @@ void execute_all(int *from, int *to, int ft_size) {
 			break;
 
 		case LDA_H:
-			proc.a = (proc.mem[pc + 1] << 8) & proc.mem[pc + 2];
-			proc.a &= MAX_VAL;
+			proc.a = proc.mem[(proc.mem[pc+2] << 8) | proc.mem[pc+1]];;
+			assert_val_8080(proc.a,pc);
 			pc += 2;
 			break;
 
@@ -477,8 +513,9 @@ void execute_all(int *from, int *to, int ft_size) {
 			proc.a =
 					((proc.a - pair) > MAX_VAL || (proc.a - pair) < 0) ?
 							MAX_VAL + 1 - pair : proc.a - pair;
-			if (proc.a >= 0)
-				proc.a &= MAX_VAL;
+
+			fix_reg_overflow(A_CODE);
+			assert_val_8080(proc.a,pc);
 			break;
 
 		case INX_H:
@@ -491,6 +528,10 @@ void execute_all(int *from, int *to, int ft_size) {
 		case DCR_H:
 			set_reg_by_code(B2(proc.mem[pc]),
 					get_reg_by_code(B2(proc.mem[pc])) - 1);
+
+			fix_reg_overflow(B2(proc.mem[pc]));
+			assert_val_8080(B2(proc.mem[pc]),pc);
+
 			proc.f &= 0xbf;
 			if (get_reg_by_code(B2(proc.mem[pc])) == 0)
 				proc.f |= FLAG_ZERO;
@@ -500,36 +541,40 @@ void execute_all(int *from, int *to, int ft_size) {
 		case ADC_H:
 			machine_update_reg_pair(B1(proc.mem[pc]), pc);
 			proc.a += (proc.reg_pair[0] << 8) + proc.reg_pair[1]
-					+ ((proc.f >> 4) & 1);
-			proc.a %= (MAX_VAL + 1);
-			proc.a &= MAX_VAL;
+					+ GET_AC_B(proc.f);
+
+			fix_reg_overflow(B2(proc.mem[pc]));
+			assert_val_8080(B2(proc.mem[pc]),pc);
 			break;
 
 		case MVI_H:
 			set_reg_by_code(B2(proc.mem[pc]), proc.mem[pc + 1]);
+			assert_val_8080(proc.mem[pc+1],pc);
 			pc++;
 			break;
 
 		case ADD_H:
-			proc.f |=
-					((proc.a & 0xf) + (get_reg_by_code(B1(proc.mem[pc])) & 0xf)
-							> 9) ?
-					FLAG_AC :
-									0;
+			proc.f |= ((proc.a & 0xf) + (get_reg_by_code(B1(proc.mem[pc])) & 0xf)> 9) ?
+							FLAG_AC : 0;
+
 			proc.a += get_reg_by_code(B1(proc.mem[pc]));
-			proc.a &= MAX_VAL;
-			printf("A = %o", proc.a);
+
+			fix_reg_overflow(A_CODE);
+			assert_val_8080(proc.a,pc);
 			break;
 
 		case SUB_H:
 			proc.a -= get_reg_by_code(B1(proc.mem[pc]));
-			proc.a &= MAX_VAL;
 
+			fix_reg_overflow(proc.a);
+			assert_val_8080(proc.a,pc);
 			break;
 
 		case SUI_H:
+			assert_val_8080(proc.mem[pc + 1],pc+1);
 			proc.a -= proc.mem[pc + 1];
-			proc.a &= MAX_VAL;
+			fix_reg_overflow(A_CODE);
+			assert_val_8080(proc.a,pc);
 			pc++;
 			break;
 
@@ -544,16 +589,23 @@ void execute_all(int *from, int *to, int ft_size) {
 				proc.a += 0x60;
 
 			}
-			proc.a &= MAX_VAL;
+			fix_reg_overflow(A_CODE);
+			assert_val_8080(proc.a,pc);
 			break;
 
 		case JMP_H:
+			assert_val_8080(proc.mem[pc+1],pc);
+			assert_val_8080(proc.mem[pc+2],pc);
+
 			printf("JMP is working : pc = %o ->", pc);
 			pc = (proc.mem[pc + 1] | (proc.mem[pc + 2] << 8)) - 1;
 			printf("%o\n", pc + 1);
 			break;
 
 		case JNZ_H:
+			assert_val_8080(proc.mem[pc+1],pc);
+			assert_val_8080(proc.mem[pc+2],pc);
+
 			if (!GET_ZERO_B(proc.f)) {
 				printf("JNZ is working : pc = %o ->", pc);
 				pc = (proc.mem[pc + 1] | (proc.mem[pc + 2] << 8)) - 1;
@@ -566,6 +618,9 @@ void execute_all(int *from, int *to, int ft_size) {
 			break;
 
 		case JZ_H:
+			assert_val_8080(proc.mem[pc+1],pc);
+			assert_val_8080(proc.mem[pc+2],pc);
+
 			if (GET_ZERO_B(proc.f)) {
 				printf("JZ is working : pc = %o ->", pc);
 				pc = (proc.mem[pc + 1] | (proc.mem[pc + 2] << 8)) - 1;
@@ -580,17 +635,22 @@ void execute_all(int *from, int *to, int ft_size) {
 		case LDAX_H:
 			machine_update_reg_pair(B2(proc.mem[pc]) - 1, pc);
 			proc.a = proc.mem[(proc.reg_pair[0] << 8) | proc.reg_pair[1]];
+			assert_val_8080(proc.a,pc);
 			break;
 
 		case STAX_H:
 			machine_update_reg_pair(B2(proc.mem[pc]), pc);
+			assert_val_8080(proc.a,pc);
 			proc.mem[(proc.reg_pair[0] << 8) | proc.reg_pair[1]] = proc.a;
 			break;
 
 		case DAD_H:
 			machine_update_reg_pair(B2(proc.mem[pc]) - 1, pc);
-			proc.h += proc.reg_pair[0];
 			proc.l += proc.reg_pair[1];
+			proc.h += proc.reg_pair[0] + fix_reg_overflow(L_CODE);
+
+			assert_val_8080(proc.l,pc);
+			assert_val_8080(proc.h,pc);
 			break;
 
 		case OUT_H:
@@ -652,12 +712,17 @@ void execute_all(int *from, int *to, int ft_size) {
 			break;
 
 		case ANI_H:
+			assert_val_8080(proc.mem[pc + 1],pc+1);
 			proc.a &= proc.mem[pc + 1];
+			assert_val_8080(proc.a,pc);
 			pc++;
 			break;
 
 		case ADI_H:
+			assert_val_8080(proc.mem[pc + 1],pc+1);
 			proc.a += proc.mem[pc + 1];
+			fix_reg_overflow(A_CODE);
+			assert_val_8080(proc.a,pc);
 //			printf("ADI A = %o\n",proc.a);
 			pc++;
 			break;
@@ -673,6 +738,9 @@ void execute_all(int *from, int *to, int ft_size) {
 			break;
 
 		case CALL_H:
+			assert_val_8080(proc.mem[pc + 1],pc+1);
+			assert_val_8080(proc.mem[pc + 2],pc+2);
+
 			proc.mem[proc.sp - 1] = (pc + 3) & MAX_VAL;
 			proc.mem[proc.sp - 2] = ((pc + 3) >> 8) & MAX_VAL;
 			pc = (proc.mem[pc + 1] | (proc.mem[pc + 2] << 8)) - 1;
@@ -720,7 +788,7 @@ int test_all(int *from, int *to, int ft_size) {
 		machine_print_mem(from[i], to[i]);
 
 		for (int j = from[i]; j <= to[i]; ++j)
-			assert_8080(proc.mem[j] == test_mem[j], j, "regression test error");
+			test_assert_8080(test_mem[j],proc.mem[j], j, "regression test error");
 	}
 
 	return 0;

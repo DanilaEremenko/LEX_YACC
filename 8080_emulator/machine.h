@@ -22,7 +22,6 @@
 #define GET_PAR_B(f)	(f>>2) & 1
 #define GET_CARRY_B(f)	(f>>0) & 1
 
-
 #define FLAG_SIGN 	(1<<7)
 #define FLAG_ZERO 	(1<<6)
 #define FLAG_AC		(1<<4)
@@ -38,6 +37,14 @@
 #define SSEG_6 (0<<7)|(1<<6)|(1<<5)|(1<<4)|(1<<3)|(1<<2)|(0<<1)|(1<<0)
 #define SSEG_7 (0<<7)|(0<<6)|(0<<5)|(0<<4)|(0<<3)|(1<<2)|(1<<1)|(1<<0)
 
+#define FIX_OVFL(num,ovfl)	{\
+		if (num > MAX_VAL) {\
+			num = (num % MAX_VAL) - 1;\
+			ovfl = 1;\
+		} else if (num < MIN_VAL) {\
+			num = (MAX_VAL - num) - 1;\
+		}\
+};
 
 struct processor_8086 {
 	int mem[MEM_SIZE];
@@ -52,7 +59,6 @@ struct processor_8086 {
 	int reg_pair[2]; //current pair
 	int sseg_el[4];
 }typedef processor_8086;
-
 
 int machine_get_code_of_reg(char *reg_name);
 

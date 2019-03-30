@@ -39,7 +39,7 @@
 
 #define FIX_OVFL(num,ovfl)	{\
 		if (num > MAX_VAL) {\
-			num = (num % MAX_VAL) - 1;\
+			num = (num - MAX_VAL) - 1;\
 			ovfl = 1;\
 		} else if (num < MIN_VAL) {\
 			num = (MAX_VAL - num) - 1;\

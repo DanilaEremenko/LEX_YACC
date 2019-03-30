@@ -1,31 +1,112 @@
-000:LXI B;
-001:000;
+000:LXI SP;
+001:200;
 002:000;
-003:DCR B;
-004:DCR C;
-005:JMP;
-006:050;
-007:000;
 
+/*@BC ovfl test-------------------------*/
+/*@low bound ovfl*/
+003:LXI B;
+004:000;
+005:000;
+006:DCR B;
+007:DCR C;
+010:PUSH B;
 
-/*TODO add more tests*/
+/*@top bound ovfl*/
+011:INR B;
+012:INR B;
+013:INR C;
+014:INR C;
+015:PUSH B;
 
+016:LXI B;
+017:376;
+020:376;
+021:INR B;
+022:INR B;
+023:INR C;
+024:INR C;
+025:PUSH B;
 
-050:LXI SP;
-051:200;
+/*@DE ovfl test-------------------------*/
+/*@low bound ovfl*/
+026:LXI D;
+027:000;
+030:000;
+031:DCR D;
+032:DCR E;
+033:PUSH D;
+
+/*@top bound ovfl*/
+034:INR D;
+035:INR D;
+036:INR E;
+037:INR E;
+040:PUSH D;
+
+041:LXI D;
+042:376;
+043:376;
+044:INR D;
+045:INR D;
+046:INR E;
+047:INR E;
+050:PUSH D;
+
+/*@HL ovfl test-------------------------*/
+/*@low bound ovfl*/
+051:LXI H;
 052:000;
-053:PUSH B;
-054:HLT;
+053:000;
+054:DCR H;
+055:DCR L;
+056:PUSH H;
+
+/*@top bound ovfl*/
+057:INR H;
+060:INR H;
+061:INR L;
+062:INR L;
+063:PUSH H;
+
+064:LXI H;
+065:376;
+066:376;
+067:INR H;
+070:INR H;
+071:INR L;
+072:INR L;
+073:PUSH H;
+074:HLT;
 
 
+FROM 11 TO 14;
 
-/*TODO add more tests*/
-ASSERT 176 177;
+ASSERT 175 177;
 
 
-/*TODO add more tests*/
-T:176:377;
+/*@ BC test*/
 T:177:377;
+T:176:377;
+T:175:001;
+T:174:001;
+T:173:001;
+T:172:001;
+
+/*@ DE test*/
+T:171:377;
+T:170:377;
+T:167:001;
+T:166:001;
+T:165:001;
+T:164:001;
+
+/*@ HL test*/
+T:163:377;
+T:162:377;
+T:161:001;
+T:160:001;
+T:159:001;
+T:158:001;
 
 TEST;
 

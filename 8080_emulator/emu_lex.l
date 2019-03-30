@@ -34,6 +34,7 @@ extern YYSTYPE yylval;
 LXI							{return LXI;}
 MOV							{return MOV;}
 INX							{return INX;}
+INR							{return INR;}
 HLT							{return HLT;}
 PUSH						{return PUSH;}
 POP							{return POP;}

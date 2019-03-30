@@ -1,6 +1,7 @@
 %token LXI
 %token MOV
 %token INX
+%token INR
 %token HLT
 %token PUSH
 %token POP
@@ -113,6 +114,12 @@ line:	NUM ':' LXI REG ';' NUM ':' NUM ';' NUM ':' NUM ';'
 				{
 					proc.mem[OTD($1)] = (machine_get_code_of_reg($4) << 3) | 3;
 					proc.hashs[OTD($1)] = INX_H;
+				};
+				
+|	NUM ':' INR REG ';'
+				{
+					proc.mem[OTD($1)] = (machine_get_code_of_reg($4) << 3) | 4;
+					proc.hashs[OTD($1)] = INR_H;
 				};
 				
 |	NUM ':' DCR REG ';'

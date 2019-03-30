@@ -525,12 +525,28 @@ void execute_all(int *from, int *to, int ft_size) {
 					(pair >> 8) & MAX_VAL);
 			break;
 
+		case INR_H:
+			set_reg_by_code(B2(proc.mem[pc]),
+					get_reg_by_code(B2(proc.mem[pc])) + 1);
+
+			fix_reg_overflow(B2(proc.mem[pc]));
+			assert_val_8080(B2(proc.mem[pc]),pc);
+			assert_val_8080(get_reg_by_code(B2(proc.mem[pc])),pc);
+
+			proc.f &= 0xbf;
+			if (get_reg_by_code(B2(proc.mem[pc])) == 0)
+				proc.f |= FLAG_ZERO;
+
+
+			break;
+
 		case DCR_H:
 			set_reg_by_code(B2(proc.mem[pc]),
 					get_reg_by_code(B2(proc.mem[pc])) - 1);
 
 			fix_reg_overflow(B2(proc.mem[pc]));
 			assert_val_8080(B2(proc.mem[pc]),pc);
+			assert_val_8080(get_reg_by_code(B2(proc.mem[pc])),pc);
 
 			proc.f &= 0xbf;
 			if (get_reg_by_code(B2(proc.mem[pc])) == 0)

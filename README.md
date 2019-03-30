@@ -31,10 +31,10 @@
 000:LXI SP;		/*initialize SP*/
 001:200;
 002:000;
-003:LXI H;		/*HL - addres of  v1*/
+003:LXI H;		/*HL = &v1*/
 004:206;	
 005:000;
-006:LXI D;		/*DE = address of v2*/
+006:LXI D;		/*DE = &v2*/
 007:207;
 010:000;
 011:JMP;		/*just test jump*/
@@ -44,10 +44,10 @@
 /*@exchange v1 <-> v2---------------*/
 021:MOV A,M;	/*A = v1 (&v1 = HL)		*/
 022:PUSH PSW;	/*save v1			*/
-023:LDAX D;		/*A = v2 (&v2 = DE)	*/
-024:MOV M,A;	/*&v1 = v2			*/
+023:LDAX D;	/*A = v2 (&v2 = DE)		*/
+024:MOV M,A;	/*v1 = v2			*/
 025:POP PSW;	/*A = v1			*/
-026:STAX D;		/*&v2 = v1		*/
+026:STAX D;	/*v2 = v1			*/
 027:JMP;
 030:104;
 031:000;

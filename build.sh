@@ -10,15 +10,17 @@
 #		-t  test on *.test files in 8080_emulator/tests directory
 
 
-#BUILD PARAMS
+#------------ BUILD PARAMS ---------------
 MODE=$1;
 DIR=$2;
 
-#BUILD PARAMS
+#------------ BUILD PARAMS ---------------
 CC="gcc";
 CCFLAGS="-g -O0";
 LEXFLAGS="-s";
 YACCFLAGS="-vtd";
+
+
 
 
 if [[ $# != 2 ]]
@@ -27,22 +29,49 @@ then
 else
 	cd $DIR;
 	
-	#clean
+	# -------------- clean -----------
 	if [[ $MODE == "-r" ]]
 	then
 		rm -f out.* y.* *.out lex.yy.c
 		rm tests/*.out
 	
-	#compile
+	# -------------- compile ---------
 	elif [[ $MODE == "-c" ]]
 	then	
-		rm -f out.* y.* *.out lex.yy.c
-		yacc $YACCFLAGS *.y
-		#lex: option -s to supress default action ECHO
-		lex $LEXFLAGS *.l
-		$CC $CCFLAGS -g *.c
+		# --------------- CHECK BUILDING REQUIREMENTS ----------------------------
+		ERR_FLAG=0;
+		
+		# ----------- check flex ----------------------
+		flex --version > /dev/null
+		if [[ $? == 0 ]] 
+		then
+		        echo -e "flex... OK\n";
+		else
+		        echo -e "error : flex is not installed, exiting...\n"
+		        ERR_FLAG = 1;
+		fi
+		
+		# ----------- check yacc -----------------------
+		yacc --version > /dev/null
+		if [[ $? == 0 ]] 
+		then
+		        echo -e "yacc... OK\n";
+		else
+		        echo -e "error : yacc is not installed, exiting...\n"
+		        ERR_FLAG = 1;
+		fi
+		
+		# ----------- compile if ERR_FLAG == 0 -----------
+		if [[ !$ERR_FLAG ]]
+		then
+			rm -f out.* y.* *.out lex.yy.c
+			yacc $YACCFLAGS *.y
+			#lex: option -s to supress default action ECHO
+			lex $LEXFLAGS *.l
+			$CC $CCFLAGS -g *.c
+		fi
 	
-	#execute
+	# ------------ execute ---------------
 	elif [[ $MODE = "-e" ]]
 	then
 		for testIn in $(ls | grep "\.in" )
@@ -56,7 +85,7 @@ else
 			
 		done
 	
-	#tests
+	# ------------ tests ----------------
 	elif [[ $MODE = "-t" ]]
 	then
 		echo -e "\n______________________TEST MODE________________________\n";

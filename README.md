@@ -3,7 +3,9 @@
 ## REQUIREMENTS
 
 -gcc
+
 -yacc
+
 -lex
 
 

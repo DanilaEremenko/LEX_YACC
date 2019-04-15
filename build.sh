@@ -62,7 +62,7 @@ else
 		fi
 		
 		# ----------- compile if ERR_FLAG == 0 -----------
-		if [[ !$ERR_FLAG ]]
+		if [[ $ERR_FLAG == 0 ]]
 		then
 			rm -f out.* y.* *.out lex.yy.c
 			yacc $YACCFLAGS *.y
@@ -113,3 +113,6 @@ else
 	fi
 
 fi
+
+	
+	

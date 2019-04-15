@@ -4,9 +4,10 @@
 
 -gcc
 
--yacc
+-flex
 
--lex
+-yacc | bison
+
 
 
 ## BUILDING & EXECUTION & TESTING & CLEANING :

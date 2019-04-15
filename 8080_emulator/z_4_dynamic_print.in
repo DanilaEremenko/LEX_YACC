@@ -1,20 +1,21 @@
 /*@initialize_DI*/
-000:MVI A;
-001:200;
-002:OUT;
-003:013;
+000:CALL;
+001:150;
+002:000;
+003:ADD B;	/*NOP*/
 
 /*@BIG_CYCLE*/
 004:MVI D;	/*delay (replace to 000 on real device)*/
-005:001;	
+005:010;
+	
 /*@print number_1*/
-006:MVI B;	/*delay (replace to 000 on real device)*/
+006:MVI B;		/*delay (replace to 000 on real device)*/
 007:001;
-010:MVI A;	/*load sseg*/
-011:117;
-012:OUT; 	/*load to common bus*/
+010:MOV A, M;	/*load sseg*/
+011:INX H;
+012:OUT; 		/*load to common bus*/
 013:010;
-014:MVI A;	/*define switch*/
+014:MVI A;		/*define switch*/
 015:001;
 016:OUT;		/*print*/
 017:011;
@@ -22,60 +23,97 @@
 021:JNZ;
 022:010;
 023:000;
+
 /*@print number_2*/
-024:MVI C;	/*delay (replace to 000 on real device)*/
+024:MVI B;		/*delay (replace to 000 on real device)*/
 025:001;
-026:MVI A;	/*load sseg*/
-027:133;
-030:OUT;	/*load to common bus*/
+026:MOV A, M;	/*load sseg*/
+027:INX H;
+030:OUT;		/*load to common bus*/
 031:010;
-032:MVI A;	/*define switch*/
+032:MVI A;		/*define switch*/
 033:002;
-034:OUT;	/*print*/
+034:OUT;		/*print*/
 035:011;
-036:DCR C;
+036:DCR B;
 037:JNZ;
 040:026;
 041:000;
 
 /*@print number_3*/
-042:MVI E;	/*delay (replace to 000 on real device)*/
+042:MVI B;		/*delay (replace to 000 on real device)*/
 043:001;
-044:MVI A;	/*load sseg*/
-045:077;
-046:OUT;	/*load to common bus*/
+044:MOV A, M;	/*load sseg*/
+045:INX H;
+046:OUT;		/*load to common bus*/
 047:010;
-050:MVI A;	/*define switch*/
+050:MVI A;		/*define switch*/
 051:004;
-052:OUT;	/*print*/
+052:OUT;		/*print*/
 053:011;
-054:DCR E;
+054:DCR B;
 055:JNZ;
 056:044;
 057:000;
 
-/*@print number_4*/
-060:MVI H;	/*delay (replace to 000 on real device)*/
-061:001;	
-062:MVI A;	/*load sseg*/
-063:077;
-064:OUT;
-065:010;
-066:MVI A;	/*define switch*/
-067:010;
-070:OUT;
-071:011;
-072:DCR H;	/*print*/
-073:JNZ;
-074:062;
-075:000;
-
 /*@BIG_CYCLE_CHECK*/
-076:DCR D;
-077:JNZ;
-080:006;
-081:000;
-082:HLT;
+060:DCR D;
+061:JNZ;
+062:170;
+063:000;
+064:DCR E;
+065:JNZ;
+066:004;
+067:000;
+/*@for 2 changes*/
+070:HLT;
+/*@for infinity loop*/
+/*
+070:JMP;
+071:000;
+072:000;		
+*/
 
-FROM 0 TO 0;
+/*@INTIALIZE */
+150:MVI A;
+151:200;
+152:OUT;
+153:013;
+154:LXI H;
+155:200;
+156:000;
+157:MVI E;
+160:002;
+161:RET;
+
+/*@SHIFT H BACK*/
+170:DCR L;
+171:DCR L;
+172:DCR L;
+173:JMP;
+174:006;
+175:000;
+
+
+
+
+/*@SSEG CODES*/
+200:117;
+201:117;
+202:117;
+203:133;
+204:133;
+205:133;
+
+
+
+FROM 0 TO 3;
+FROM 4 TO 5;
+FROM 6 TO 23;
+FROM 24 TO 41;
+FROM 42 TO 57;
+FROM 60 TO 64;
+FROM 150 TO 161;
+FROM 170 TO 175;
+FROM 200 TO 205;
 /*EXEC;*/

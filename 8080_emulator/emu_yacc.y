@@ -60,7 +60,7 @@ extern int test_mem[];
 
 int line_number = 0;
 
-#define MAX_MEM_AREAS_NUM 10
+#define MAX_MEM_AREAS_NUM 20
 
 int from[MAX_MEM_AREAS_NUM];
 int to[MAX_MEM_AREAS_NUM];

@@ -87,25 +87,18 @@ int get_reg_by_code(int code) {
 	switch (code) {
 	case A_CODE:
 		return proc.a;
-
 	case B_CODE:
 		return proc.b;
-
 	case C_CODE:
 		return proc.c;
-
 	case D_CODE:
 		return proc.d;
-
 	case E_CODE:
 		return proc.e;
-
 	case H_CODE:
 		return proc.h;
-
 	case L_CODE:
 		return proc.l;
-
 	case M_CODE:
 		return proc.mem[proc.h << 8 | proc.l];
 	default:
@@ -136,10 +129,15 @@ void set_reg_by_code(int code, int val) {
 	case H_CODE:
 		proc.h = val;
 		return;
+	case L_CODE:
+		proc.l = val;
+		return;
 	case M_CODE:
 		proc.mem[(proc.h << 8) | proc.l] = val;
 		return;
-
+	default:
+		printf("undefined reg = %d (get_reg_by_code)\n", code);
+		return;
 	}
 
 }
@@ -547,7 +545,6 @@ void execute_all(int *from, int *to, int ft_size) {
 			fix_reg_overflow(B2(proc.mem[pc]));
 			assert_val_8080(B2(proc.mem[pc]),pc);
 			assert_val_8080(get_reg_by_code(B2(proc.mem[pc])),pc);
-
 			proc.f &= 0xbf;
 			if (get_reg_by_code(B2(proc.mem[pc])) == 0)
 				proc.f |= FLAG_ZERO;
@@ -767,7 +764,8 @@ void execute_all(int *from, int *to, int ft_size) {
 			pc = (proc.mem[proc.sp] << 8) + proc.mem[proc.sp + 1] - 1;
 			proc.sp += 2;
 			break;
-
+		case 0:
+			break;
 		default:
 			printf("Undefined opcode: %o:%o (code = %d)\n", pc, proc.mem[pc],
 					hash);

@@ -1,0 +1,116 @@
+/*@initialize_DI*/
+000:CALL;
+001:150;
+002:000;
+003:000;	/*NOP*/
+
+/*@BIG_CYCLE*/
+004:MVI D;	/*delay (replace to 000 on real device)*/
+005:001;	/*must be 077*/
+	
+	
+/*@cycle_for_3_number*/	
+006:MVI B;		/*delay (replace to 000 on real device)*/
+007:001;
+
+/*@print number_1*/
+010:MOV A, M;	/*load sseg*/
+011:000;
+012:OUT; 		/*load to common bus*/
+013:010;
+014:MVI A;		/*define switch*/
+015:001;
+016:OUT;		/*print*/
+017:011;
+020:INX H;
+
+/*@print number_2*/
+021:MOV A, M;	/*load sseg*/
+022:000;
+023:OUT; 		/*load to common bus*/
+024:010;
+025:MVI A;		/*define switch*/
+026:002;
+027:OUT;		/*print*/
+030:011;
+031:INX H;
+
+/*@print number_3*/
+032:MOV A, M;	/*load sseg*/
+033:000;
+034:OUT; 		/*load to common bus*/
+035:010;
+036:MVI A;		/*define switch*/
+037:004;
+040:OUT;		/*print*/
+041:011;
+
+042:DCR H;
+043:DCR H;
+044:DCR B;
+045:JNZ;
+046:010;
+047:000;
+
+
+/*@BIG_CYCLE_CHECK*/
+050:DCR D;
+051:JNZ;
+052:006;
+053:000;
+
+
+054:DCR E;
+055:JZ;
+056:000;
+057:000;
+060:INX H;
+061:INX H;
+062:INX H;
+/*
+063:JMP;
+064:000;
+065:000;
+*/
+054:HLT;
+
+
+
+
+/*@INTIALIZE */
+150:MVI A;
+151:200;
+152:OUT;
+153:013;
+154:LXI H;
+155:200;
+156:000;
+157:MVI E;
+160:002;
+161:RET;
+
+
+
+
+/*@SSEG CODES*/
+200:117;
+201:117;
+202:117;
+203:133;
+204:133;
+205:133;
+
+
+
+FROM 0 TO 3;
+FROM 4 TO 5;
+FROM 6 TO 7;
+FROM 10 TO 20;
+FROM 21 TO 31;
+FROM 32 TO 41;
+FROM 42 TO 47;
+FROM 50 TO 53;
+FROM 54 TO 62;
+FROM 63 TO 65;
+FROM 200 TO 201;
+EXEC;

@@ -1,5 +1,15 @@
 # 8080 EMULATOR GUIDE
 
+## REQUIREMENTS
+
+-gcc
+
+-flex
+
+-yacc | bison
+
+
+
 ## BUILDING & EXECUTION & TESTING & CLEANING :
 
 1) Compile emulator

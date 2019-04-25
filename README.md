@@ -1,5 +1,15 @@
 # 8080 EMULATOR GUIDE
 
+## REQUIREMENTS
+
+-gcc
+
+-flex
+
+-yacc | bison
+
+
+
 ## BUILDING & EXECUTION & TESTING & CLEANING :
 
 1) Compile emulator
@@ -20,6 +30,8 @@
 ```
 
 ## NOTES:
+	-not all commands are supported. Supported commands can be checked in 8080_emulator/emu_lex.l
+	
 	-numbers in input file will be perceived as octal
 
 	-numbers in output file will be printed in octal format 

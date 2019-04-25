@@ -87,25 +87,18 @@ int get_reg_by_code(int code) {
 	switch (code) {
 	case A_CODE:
 		return proc.a;
-
 	case B_CODE:
 		return proc.b;
-
 	case C_CODE:
 		return proc.c;
-
 	case D_CODE:
 		return proc.d;
-
 	case E_CODE:
 		return proc.e;
-
 	case H_CODE:
 		return proc.h;
-
 	case L_CODE:
 		return proc.l;
-
 	case M_CODE:
 		return proc.mem[proc.h << 8 | proc.l];
 	default:
@@ -552,7 +545,6 @@ void execute_all(int *from, int *to, int ft_size) {
 			fix_reg_overflow(B2(proc.mem[pc]));
 			assert_val_8080(B2(proc.mem[pc]),pc);
 			assert_val_8080(get_reg_by_code(B2(proc.mem[pc])),pc);
-
 			proc.f &= 0xbf;
 			if (get_reg_by_code(B2(proc.mem[pc])) == 0)
 				proc.f |= FLAG_ZERO;

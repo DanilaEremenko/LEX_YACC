@@ -10,7 +10,7 @@
 #define MAX_VAL		0xff
 #define MIN_VAL		0
 
-#define MEM_SIZE 1024
+#define MEM_SIZE 0xffff
 
 #define B1(val)	 (val>>0) & 7
 #define B2(val)	 (val>>3) & 7
@@ -22,11 +22,6 @@
 #define GET_PAR_B(f)	(f>>2) & 1
 #define GET_CARRY_B(f)	(f>>0) & 1
 
-#define FLAG_SIGN 	(1<<7)
-#define FLAG_ZERO 	(1<<6)
-#define FLAG_AC		(1<<4)
-#define FLAG_PAR	(1<<2)
-#define FLAG_CARRY 	(1<<0)
 
 #define SSEG_0 (0<<7)|(0<<6)|(1<<5)|(1<<4)|(1<<3)|(1<<2)|(1<<1)|(1<<0)
 #define SSEG_1 (0<<7)|(0<<6)|(0<<5)|(0<<4)|(0<<3)|(1<<2)|(1<<1)|(0<<0)

@@ -10,7 +10,7 @@
 
 	/*@print number_1*/
 	006:MVI B;		
-	007:002;		/* delay replace with 000 on device */
+	007:002;		/* delay replace with big num on device */
 	010:MOV A,M;	/*load sseg*/
 	011:OUT; 		/*load to common bus*/
 	012:010;
@@ -27,7 +27,7 @@
 	
 	/*@print number_2*/
 	024:MVI B;		
-	025:002;		/* delay replace with 000 on device */
+	025:002;		/* delay replace with big num on device */
 	026:MOV A,M;	/*load sseg*/
 	027:OUT;		/*load to common bus*/
 	030:010;		
@@ -43,7 +43,7 @@
 	
 	/*@print number_3*/
 	042:MVI B;		
-	043:002;		/* delay replace with 000 on device */
+	043:002;		/* delay replace with big num on device */
 	044:MOV A,M;	/*load sseg*/
 	045:OUT;		/*load to common bus*/
 	046:010;	
@@ -112,4 +112,4 @@ FROM 60 TO 71;
 FROM 100 TO 111;
 FROM 120 TO 127;
 FROM 200 TO 205;
-EXEC;
+/*EXEC;*/

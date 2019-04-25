@@ -47,6 +47,7 @@ LDA							{return LDA;}
 SBB							{return SBB;}
 EXEC;						{return EXEC;}
 DCR							{return DCR;}
+DCX							{return DCX;}
 JNZ							{return JNZ;}
 LDAX						{return LDAX;}
 STAX						{return STAX;}
@@ -62,6 +63,10 @@ RLC							{return RLC;}
 CALL						{return CALL;}
 RET							{return RET;}
 NOP							{return NOP;}
+CMP							{return CMP;}
+JC							{return JC;}
+JNC							{return JNC;}
+
 FROM						{return FROM;}
 TO							{return TO;}
 ASSERT						{return ASSERT;}

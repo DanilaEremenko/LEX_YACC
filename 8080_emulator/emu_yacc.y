@@ -3,8 +3,10 @@
 %token INX
 %token INR
 %token HLT
+
 %token PUSH
 %token POP
+
 %token MVI
 %token ADD
 %token SUB
@@ -12,22 +14,34 @@
 %token ADC
 %token LDA
 %token SBB
-%token JNZ
 %token DCR
+%token DCX
+
 %token LDAX
 %token STAX
+
 %token JZ
+%token JNZ
+%token JC
+%token JNC
 %token JMP
+
+
 %token DAD
 %token SUI
 %token OUT
+
 %token ANI
 %token ADI
 %token RRC
 %token RLC
 %token CALL
+
 %token RET
+%token CMP
+
 %token NOP
+
 %token<text>REG
 %token<ival>NUM
 %token COMMENTS
@@ -129,6 +143,12 @@ line:	NUM ':' LXI REG ';' NUM ':' NUM ';' NUM ':' NUM ';'
 					proc.hashs[OTD($1)] = DCR_H;
 				};
 				
+|	NUM ':' DCX REG ';'
+				{
+					proc.mem[OTD($1)] = ((machine_get_code_of_reg($4)+1) << 3) | 3;
+					proc.hashs[OTD($1)] = DCR_H;
+				};
+				
 |	NUM ':' HLT ';'
 				{
 					proc.mem[OTD($1)] = (1<<6) | (6<<3) | (6<<0);
@@ -213,6 +233,25 @@ line:	NUM ':' LXI REG ';' NUM ':' NUM ';' NUM ':' NUM ';'
 					proc.hashs[OTD($1)] = JZ_H;
 					
 				};
+
+|	NUM ':' JC	';' NUM ':' NUM ';' NUM ':' NUM ';'
+				{
+					proc.mem[OTD($1)] = (3 << 6) | (3 << 3) | 2;
+					proc.mem[OTD($5)] = OTD($7);
+					proc.mem[OTD($9)] = OTD($11);
+					proc.hashs[OTD($1)] = JC_H;
+					
+				};
+				
+|	NUM ':' JNC	';' NUM ':' NUM ';' NUM ':' NUM ';'
+				{
+					proc.mem[OTD($1)] = (3 << 6) | (2 << 3) | 2;
+					proc.mem[OTD($5)] = OTD($7);
+					proc.mem[OTD($9)] = OTD($11);
+					proc.hashs[OTD($1)] = JNC_H;
+					
+				};
+
 				
 |	NUM ':' JMP	';' NUM ':' NUM ';' NUM ':' NUM ';'
 				{
@@ -292,12 +331,20 @@ line:	NUM ':' LXI REG ';' NUM ':' NUM ';' NUM ':' NUM ';'
 					proc.mem[OTD($1)] = (0<<6) | (0<<3) | 7;
 					proc.hashs[OTD($1)] = RLC_H;
 				};
+				
+|	NUM ':' CMP	REG ';'
+				{
+					proc.mem[OTD($1)] = (2 << 6) | (7 << 3) | machine_get_code_of_reg($4);
+					proc.hashs[OTD($1)] = CMP_H;
+				
+				};
+
 
 |	NUM ':' NOP ';'
 				{
 					proc.mem[OTD($1)] = 0;
 					proc.hashs[OTD($1)] = NOP_H;
-				}
+				};
 				
 				
 |	NUM ':' NUM ';'

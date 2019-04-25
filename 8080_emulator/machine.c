@@ -136,10 +136,15 @@ void set_reg_by_code(int code, int val) {
 	case H_CODE:
 		proc.h = val;
 		return;
+	case L_CODE:
+		proc.l = val;
+		return;
 	case M_CODE:
 		proc.mem[(proc.h << 8) | proc.l] = val;
 		return;
-
+	default:
+		printf("undefined reg = %d (get_reg_by_code)\n", code);
+		return;
 	}
 
 }
@@ -766,6 +771,9 @@ void execute_all(int *from, int *to, int ft_size) {
 		case RET_H:
 			pc = (proc.mem[proc.sp] << 8) + proc.mem[proc.sp + 1] - 1;
 			proc.sp += 2;
+			break;
+
+		case NOP_H:
 			break;
 
 		default:

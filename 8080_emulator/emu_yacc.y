@@ -27,6 +27,7 @@
 %token RLC
 %token CALL
 %token RET
+%token NOP
 %token<text>REG
 %token<ival>NUM
 %token COMMENTS
@@ -291,6 +292,12 @@ line:	NUM ':' LXI REG ';' NUM ':' NUM ';' NUM ':' NUM ';'
 					proc.mem[OTD($1)] = (0<<6) | (0<<3) | 7;
 					proc.hashs[OTD($1)] = RLC_H;
 				};
+
+|	NUM ':' NOP ';'
+				{
+					proc.mem[OTD($1)] = 0;
+					proc.hashs[OTD($1)] = NOP_H;
+				}
 				
 				
 |	NUM ':' NUM ';'

@@ -61,6 +61,7 @@ RRC							{return RRC;}
 RLC							{return RLC;}
 CALL						{return CALL;}
 RET							{return RET;}
+NOP							{return NOP;}
 FROM						{return FROM;}
 TO							{return TO;}
 ASSERT						{return ASSERT;}

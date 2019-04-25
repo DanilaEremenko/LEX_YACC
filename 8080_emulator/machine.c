@@ -429,7 +429,7 @@ int test_all(int *from, int *to, int ft_size) {
 
 /*execute while proc.hashs[pc] != HLT*/
 void execute_all(int *from, int *to, int ft_size) {
-	int attach_var = 0;
+//	int attach_var = 0;
 //	while (!attach_var)
 //		attach_var = 0;
 
@@ -457,6 +457,8 @@ void execute_all(int *from, int *to, int ft_size) {
 	int prev_pc;
 
 	for (int pc = 0;; ++pc) {
+		int cf_sign, cf_zero, cf_ac, cf_par, cf_carry;/*TODO current flags, somebody add please*/
+
 		old_a = proc.a;
 
 		/*stay sane*/
@@ -546,7 +548,6 @@ void execute_all(int *from, int *to, int ft_size) {
 
 		case LDA_H:
 			proc.a = proc.mem[(proc.mem[pc + 2] << 8) | proc.mem[pc + 1]];
-			;
 			assert_val_8080(proc.a, pc);
 			pc += 2;
 			break;
@@ -598,14 +599,14 @@ void execute_all(int *from, int *to, int ft_size) {
 			break;
 
 		case DCX_H:
-			machine_update_reg_pair(get_reg_by_code(B2(proc.mem[pc])-1),pc);
+			machine_update_reg_pair(get_reg_by_code(B2(proc.mem[pc]) - 1), pc);
 			pair = (proc.reg_pair[0] << 8) | proc.reg_pair[1];
-			machine_set_reg_pair(DCX_H, get_reg_by_code(B2(proc.mem[pc])-1), pair & 0xff, pair >> 8);
-
+			machine_set_reg_pair(DCX_H, get_reg_by_code(B2(proc.mem[pc]) - 1),
+					pair & 0xff, pair >> 8);
 
 			fix_reg_overflow(B2(proc.mem[pc]));
 			assert_val_8080(B2(proc.mem[pc]), pc);
-			assert_val_8080(get_reg_by_code(B2(proc.mem[pc])-1), pc);
+			assert_val_8080(get_reg_by_code(B2(proc.mem[pc]) - 1), pc);
 			proc.f &= 0xbf;
 			if (get_reg_by_code(B2(proc.mem[pc])) == 0)
 				proc.f |= FLAG_ZERO;

@@ -83,14 +83,14 @@
 	111:RET;
 
 
-/*@print next 3 numbers*/
+/*@print next 4 numbers*/
 	120:DCR E;
 	121:JNZ;
 	122:004;
 	123:000;
 	
 	124:JMP;
-	125:127;/* delay replace with 000 on device */
+	125:127;/* delay replace with 000 on device for infinity loop */
 	126:000;
 	
 	127:HLT;

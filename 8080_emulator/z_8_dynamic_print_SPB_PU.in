@@ -1,0 +1,142 @@
+/*@initialize_DI*/
+000:CALL;
+001:200;
+002:000;
+003:NOP;
+
+/*@BIG_CYCLE*/
+004:MVI D;	
+005:001;	/* delay replace with 000 on device */
+
+	/*@print number_1*/
+	006:MVI B;		
+	007:001;		/* delay replace with big num on device (010)*/
+		010:MOV A,M;	/*load sseg*/
+		011:OUT; 		/*load to common bus*/
+		012:010;
+		013:MVI A;		/*define switch*/
+		014:001;
+		015:OUT;		/*print*/
+		016:011;
+	017:DCR B;
+	020:JNZ;
+	021:010;
+	022:000;
+	023:INX H;		/*INX pointer to sseg*/
+	
+	
+	/*@print number_2*/
+	024:MVI B;		
+	025:001;		/* delay replace with big num on device (110)*/
+		026:MOV A,M;	/*load sseg*/
+		027:OUT;		/*load to common bus*/
+		030:010;		
+		031:MVI A;		/*define switch*/
+		032:002;
+		033:OUT;		/*print*/
+		034:011;
+	035:DCR B;
+	036:JNZ;
+	037:026;
+	040:000;
+	041:INX H;		/*INX pointer to sseg*/
+	
+	/*@print number_3*/
+	042:MVI B;		
+	043:001;		/* delay replace with big num on device (210)*/
+		044:MOV A,M;	/*load sseg*/
+		045:OUT;		/*load to common bus*/
+		046:010;	
+		047:MVI A;		/*define switch*/
+		050:004;
+		051:OUT;		/*print*/
+		052:011;
+	053:DCR B;
+	054:JNZ;
+	055:044;
+	056:000;
+	057:INX H;		/*INX pointer to sseg*/
+
+	/*@print number_4*/
+	060:MVI B;		
+	061:001;		/* delay replace with big num on device (310)*/
+		062:MOV A,M;	/*load sseg*/
+		063:OUT;		/*load to common bus*/
+		064:010;	
+		065:MVI A;		/*define switch*/
+		066:010;
+		067:OUT;		/*print*/
+		70:011;
+	071:DCR B;
+	072:JNZ;
+	073:062;
+	074:000;
+	075:INX H;		/*INX pointer to sseg*/
+	
+		
+/*@BIG_CYCLE_CHECK*/
+076:DCR D;
+077:JZ;		/*update E*/
+100:220;
+101:000;
+102:DCR L;	/*recover HL*/
+103:DCR L;
+104:DCR L;
+105:DCR L;
+106:JMP;	/*loop*/
+107:006;
+110:000;
+
+
+/*@init*/
+	200:MVI A;
+	201:200;
+	202:OUT;
+	203:013;
+	204:LXI H;
+	205:300;
+	206:000;
+	207:MVI E;
+	210:006;
+	211:RET;
+
+
+/*@print next 4 numbers*/
+	220:DCR L;
+	221:DCR L;
+	222:DCR L;
+	223:DCR E;
+	224:JNZ;
+	225:004;
+	226:000;
+	
+	227:JMP;
+	230:232;	/* delay replace with 000 on device for infinity loop */
+	231:000;
+	
+	232:HLT;
+	
+
+/*SSEG CODES*/
+300:071; 	/*С*/
+301:067;	/*П*/
+302:175;	/*Б*/
+303:067; 	/*П*/
+304:156; 	/*У*/
+305:133; 	/*2*/
+306:077; 	/*0*/
+307:006; 	/*1*/
+310:157; 	/*9*/
+
+
+
+FROM 0 TO 5;
+FROM 6 TO 23;
+FROM 24 TO 41;
+FROM 42 TO 57;
+FROM 60 TO 75;
+FROM 76 TO 110;
+FROM 200 TO 211;
+FROM 220 TO 232;
+FROM 300 TO 310;
+/*EXEC;*/

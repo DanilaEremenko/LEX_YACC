@@ -15,7 +15,7 @@
 		011:OUT; 		/*load to common bus*/
 		012:010;
 		013:MVI A;		/*define switch*/
-		014:001;
+		014:010;
 		015:OUT;		/*print*/
 		016:011;
 	017:DCR B;
@@ -32,7 +32,7 @@
 		027:OUT;		/*load to common bus*/
 		030:010;		
 		031:MVI A;		/*define switch*/
-		032:002;
+		032:004;
 		033:OUT;		/*print*/
 		034:011;
 	035:DCR B;
@@ -48,7 +48,7 @@
 		045:OUT;		/*load to common bus*/
 		046:010;	
 		047:MVI A;		/*define switch*/
-		050:004;
+		050:002;
 		051:OUT;		/*print*/
 		052:011;
 	053:DCR B;
@@ -64,7 +64,7 @@
 		063:OUT;		/*load to common bus*/
 		064:010;	
 		065:MVI A;		/*define switch*/
-		066:010;
+		066:001;
 		067:OUT;		/*print*/
 		70:011;
 	071:DCR B;

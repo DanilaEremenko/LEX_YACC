@@ -83,7 +83,7 @@
 	111:RET;
 
 
-/*@print next 4 numbers*/
+/*@print next 3 numbers*/
 	120:DCR E;
 	121:JNZ;
 	122:004;

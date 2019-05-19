@@ -1,165 +1,201 @@
-000:LXI SP;		/*we'll use stack for saving numbers*/
+/*@initialize_DI*/
+000:JMP;			/*JMP init*/
 001:200;
 002:000;
-003:MVI B;		/*clear_B for using BE*/
-004:000;
-/*@initialize_DI*/
-005:MVI A;
-006:200;
-007:OUT;
-010:013;
-
-/*@init_pointer_on_printed_area*/
-011:LXI H;	/*HL = &matrix[0]*/
-012:200;
-013:000;
-014:MVI D;	/*D = load_matrix_size*/
-015:016;
+003:NOP;
 
 
-/*@check first 3 bits*/
-016:MVI A;
-017:001;
-020:PUSH PSW;
-021:MOV A,M;
-022:ANI;
-023:007;	/*conjunction with mask*/
-024:ADI;	/*A  = &sseg_code(A)*/
-025:300;
-026:MOV C,A;/*BC = &sseg_code(A)*/
-027:LDAX B; /*A = sseg_code(A)  */
-030:PUSH PSW;		/*save_first_3_bits	*/
+/*-------------- @BIG_CYCLE -------------------*/
+004:MVI D;	
+005:001;	/* delay replace with 000 on device */
 
-/*@check_second_3_bits*/
-031:MVI A;
-032:002;
-033:PUSH PSW;
-034:MOV A,M;
-035:RRC;
-036:RRC;
-037:RRC;
-040:ANI;
-041:007;
-042:ADI;
-043:300;
-044:MOV C,A;
-045:LDAX B;	 /*A = sseg_code(A)  */
-046:PUSH PSW;		 /*save_second_3_bits	 */
+006:PUSH D;
 
-/*@check_third_3_bits*/
-047:MVI A;
-050:004;
-051:PUSH PSW;
-052:MOV A,M;
-053:RLC;
-054:RLC;
-055:ANI;
-056:003;
-057:ADI;
-060:300;
-061:MOV C,A;
-062:LDAX B;
-063:PUSH PSW;		/*save_third_3_bits	 */
+	/*------------------- 1-3 bits ------------------------------*/
+	007:MVI D;		
+	010:001;			/* delay replace with big num on device (310)*/
+		
+		/*@load 1-3 bits to accumulator*/
+		011:MOV A,M;
+		012:ANI;
+		013:007;			/*conjunction with mask*/
+		014:ADI;			/*A  = &sseg_code(A)*/
+		015:300;
+		016:MOV C,A;		/*BC = &sseg_code(A)*/
+		017:LDAX B; 		/*A = sseg_code(A)  */
+		
+		/*@print 1-3 bits with decay*/
+		020:OUT;		/*load to common bus*/
+		021:010;	
+		022:MVI A;		/*define switch*/
+		023:001;
+		024:OUT;		/*print*/
+		025:011;
+	
+	
+	/*@check small delay*/
+	026:DCR D;
+	027:JNZ;
+	030:011;
+	031:000;
+
+	/*------------------- 4-6 bits ------------------------------*/	
+	032:MVI D;		
+	033:001;			/* delay replace with big num on device (210)*/
+
+		/*@load 4-6 bits to accumulator*/
+		034:MOV A,M;
+		035:RRC;
+		036:RRC;
+		037:RRC;
+		040:ANI;
+		041:007;
+		042:ADI;
+		043:300;
+		044:MOV C,A;
+		045:LDAX B;	 		/*A = sseg_code(A)  */
+	
+		/*@print 4-6 bits with decay*/
+		046:OUT;		/*load to common bus*/
+		047:010;	
+		050:MVI A;		/*define switch*/
+		051:002;
+		052:OUT;		/*print*/
+		053:011;
+
+	/*@check small delay*/
+	054:DCR D;
+	055:JNZ;
+	056:034;
+	057:000;
+	
+	/*------------------- 7-8 bits ------------------------------*/
+	060:MVI D;		
+	061:001;			/* delay replace with big num on device (310)*/
+	
+		/*@load 7-8 bits to accumulator*/
+		062:MOV A,M;
+		063:RLC;
+		064:RLC;
+		065:ANI;
+		066:003;
+		067:ADI;
+		070:300;
+		071:MOV C,A;
+		072:LDAX B;
+	
+		/*@print 7-8 bits with decay*/
+		073:OUT;		/*load to common bus*/
+		074:010;	
+		075:MVI A;		/*define switch*/
+		076:004;
+		077:OUT;		/*print*/
+		100:011;
+		
+	/*@check small delay*/
+	101:DCR D;
+	102:JNZ;
+	103:062;
+	104:000;
+/*-------------- @BIG_CYCLE_CHECK -------------------*/
+105:POP D;
+106:DCR D;
+107:JZ;		/*update E*/
+110:240;
+111:000;
+112:JMP;	/*loop*/
+113:006;
+114:000;	
 
 
+/*@init*/
+	200:MVI A;	/*prepare device for dynamic indication*/
+	201:200;
+	202:OUT;
+	203:013;
+
+	204:LXI H;	/*HL = &matrix[0]*/
+	205:330;
+	206:000;
+	207:MVI E;	/*E = printed_matrix_size*/
+	210:015;	/*13d = 15o*/
+	
+	211:LXI SP;
+	212:377;
+	213:000;
+	
+	214:LXI B;
+	215:000;
+	216:000;
+	
+	217:JMP;	/*JMP back*/
+	220:004;
+	221:000;
+	
+/*@update E*/
+	240:INX H;
+	241:DCR E;
+	242:JNZ;
+	243:004;
+	244:000;
+	
+	245:JMP;
+	246:250;	/* delay replace with 000 on device for infinity loop */
+	247:000;
+	
+	250:HLT;
+	
 
 
-
-/*@check_global_cycle*/
-064:JMP;	/*jmp to decay_and_printing_cycle*/
-065:077;
-066:000;
-067:INX H;	/*HL = &next_num*/
-070:DCR D;	/*ctr--*/
-071:JNZ;	/*ctr!=0? -> repeat*/
-072:016;
-073:000;
-074:HLT;
-
-
-
-/*@decay_and_printing_cyc just cycle which neccessary on real device*/
-077:MVI E;			/*how many numbers will be poped*/
-100:003;
-101:POP PSW;		/*A = digit*/
-102:OUT;			/*load to common bus*/
-103:010;
-104:POP PSW;		/*define switch*/
-105:OUT;			/*print*/
-106:011;
-107:MVI A;			/*big decay = A*/
-110:110;
-111:LXI B;
-112:001;			/*replace to 000*/
-113:001;			/*replace to 000*/
-114:DCR C;
-115:JNZ;
-116:114;
-117:000;
-120:DCR B;
-121:JNZ;
-122:120;
-123:000;
-124:SUI;
-125:001;
-126:JNZ;
-127:111;
-130:000;
-131:DCR E;
-132:JNZ;
-133:101;
-134:000;
-135:JMP;	/*JMP to INX H*/
-136:067;
-137:000;
-
-/*@printed_matrix*/
-200:111;
-201:122;
-202:133;
-203:144;
-204:155;
-205:166;
-206:177;
-207:200;
-210:211;
-211:222;
-212:233;
-213:244;
-214:255;
-215:266;
-216:277;
-217:300;
 
 
 /*@sseg_codes*/
-300:077;	/*0*/
-301:006;	/*1*/
-302:133;	/*2*/
-303:117;	/*3*/
-304:146;	/*4*/
-305:155;	/*5*/
-306:175;	/*6*/
-307:007;	/*7*/
+	300:077;	/*0*/
+	301:006;	/*1*/
+	302:133;	/*2*/
+	303:117;	/*3*/
+	304:146;	/*4*/
+	305:155;	/*5*/
+	306:175;	/*6*/
+	307:007;	/*7*/
 
 
-FROM 0 TO 10;
-FROM 11 TO 15;
+/*@printed_matrix*/
+	330:000;
+	331:001;
+	332:002;
+	333:003;
+	334:004;
+	335:005;
+	336:006;
+	337:007;
+	340:010;
+	341:011;
+	342:012;
+	343:013;
+	344:014;
 
-FROM 16 TO 30;
-FROM 31 TO 46;
-FROM 47 TO 63;
 
-FROM 64 TO 76;
+FROM 0 TO 3;
 
-FROM 77 TO 137;
+FROM 4 TO 6;
 
-FROM 200 TO 217;
+FROM 7 TO 31;
+FROM 32 TO 57;
+FROM 60 TO 104;
+
+FROM 105 TO 114;
+
+FROM 200 TO 221;
+
+FROM 240 TO 250;
 
 FROM 300 TO 307;
 
+FROM 330 TO 344;
 
 
-/*EXEC;*/
+
+EXEC;
 
 

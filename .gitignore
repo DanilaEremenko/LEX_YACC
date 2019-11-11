@@ -1,3 +1,8 @@
 .project
 .cproject
 .settings
+*.out
+y.tab.c
+y.tab.h
+y.output
+lex.yy.c

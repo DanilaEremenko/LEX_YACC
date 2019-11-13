@@ -6,6 +6,7 @@
 %token  ENDT
 %token <text>NUM
 %token  COMMENTS
+%token ASSIGN
 %token <ival>ACTION
 %token  IF
 %token  THEN
@@ -43,13 +44,24 @@ lines:
 
 line:
       NAME ':' '=' expression ';'
-|     func_decl
-|     func_call
-|     var_decl
+|     func_decl     {TAB_DEC_TRY();}
+|     func_call ';' {TAB_PRINT();printf("%s",currentOperand);TAB_DEC_TRY();}
+|     var_decl      {TAB_DEC_TRY();}
+|     var_assign    {TAB_DEC_TRY();}
 |     conditional
 |     BEGINT        {TAB_INC();block_next_tab = 0;}
 |     ENDT          {TAB_DEC();}
 |     ';'
+
+
+var_assign:
+      NAME ASSIGN expression ';'
+      {
+        TAB_PRINT();
+        printf("%s = ",$1);
+        PRINT_ALL_EXPRESSION_IN_CHAIN();
+        printf(";");
+      }
 
 conditional:
       IF '(' expression ')' THEN
@@ -57,8 +69,18 @@ conditional:
         TAB_PRINT();
         printf("if ");
         PRINT_ALL_EXPRESSION_IN_CHAIN();
-        printf(":\n");
+        printf(":");
         TAB_INC();
+        dec_after_next=1;
+      }
+|     IF expression THEN
+      {
+        TAB_PRINT();
+        printf("if ");
+        PRINT_ALL_EXPRESSION_IN_CHAIN();
+        printf(":");
+        TAB_INC();
+        dec_after_next=1;
       }
 
 expression:
@@ -72,6 +94,26 @@ expression:
         currentExpression->next->prev = currentExpression;
         currentExpression = currentExpression->next;
       }
+|      expression ACTION '('
+      {
+        currentExpression->next = calloc(1,sizeof(ExpressionChain));
+        currentExpression->next->arg = strdup("(");
+        currentExpression->next->action = $2;
+
+        currentExpression->next->prev = currentExpression;
+        currentExpression = currentExpression->next;
+      }
+
+|      expression ACTION ')'
+      {
+        currentExpression->next = calloc(1,sizeof(ExpressionChain));
+        currentExpression->next->arg = strdup(")");
+        currentExpression->next->action = $2;
+
+        currentExpression->next->prev = currentExpression;
+        currentExpression = currentExpression->next;
+      }
+
 |     ACTION operand
       {
         firstExpersion = calloc(1,sizeof(ExpressionChain));
@@ -97,6 +139,7 @@ operand:
       {
         currentOperand = $1;
       }
+|     func_call
 
 func_decl:
       FUNCTION NAME '(' args_seq ')' ':' TYPE ';'
@@ -104,20 +147,24 @@ func_decl:
         TAB_PRINT();
         printf("def %s(",$2);
         PRINT_ALL_WORDS_IN_CHAIN(", ")
-        printf("):\n");
+        printf("):");
         TAB_INC();
         block_next_tab = 1;
 
       };
-
 func_call:
-      NAME '(' name_seq ')' ';'
+      NAME '(' name_seq ')'
       {
-        TAB_PRINT();
-        printf("%s(",$1);
-        PRINT_ALL_WORDS_IN_CHAIN(", ")
-        printf(");");
-      };
+        currentOperand = string_concat($1,"(");
+        currentWord = firstWord;
+        while(currentWord->next != NULL){
+          currentOperand = string_concat(currentOperand ,string_concat(currentWord->buffer,","));
+          currentWord = currentWord->next;
+          free(currentWord->prev);
+        }
+        currentOperand = string_concat(currentOperand, string_concat(currentWord->buffer,")"));
+        free(currentWord);
+      }
 
 
 var_decl:
@@ -127,10 +174,10 @@ var_decl:
           PRINT_ALL_WORDS_IN_CHAIN(" = ")
           switch($4){
             case T_INT:
-              printf(" = 0\n");
+              printf(" = 0");
               break;
             case T_DOUBLE:
-              printf(" = 0.0\n");
+              printf(" = 0.0");
               break;
             default:
               fprintf(stderr,"UNDEFINED TYPE = %d, EXITING...",$4);

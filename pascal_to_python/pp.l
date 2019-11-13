@@ -1,4 +1,5 @@
-actions	(\+|\-|\=|\*|\/|\<|\>|\=|\=\=)
+actions	(\=\=|\+|\-|\=|\*|\/|\<|\>)
+
 types		(double)
 /*-------------------------------------------------------*/
 %{
@@ -19,9 +20,9 @@ extern YYSTYPE yylval;
 /*-------------------------------------------------------*/
 
 %%
-\n								{line_number++;}
+\n								{printf("\n");}
 
-[\/\/.+\n]				{return COMMENTS;}
+\/\/.+\n					{return COMMENTS;}
 [ ]+							{}
 
 function					{return FUNCTION;}
@@ -32,13 +33,8 @@ end								{return ENDT;}
 if								{return IF;}
 then							{return THEN;}
 
-
-{actions}					{
-										yylval.ival = get_action_from_str(yytext);
-										update_str_from_action(yylval.ival);
-										fprintf(stderr,"\n\nACTION = %s\n\n", currentAction);
-										free(currentAction);
-										return ACTION;
+:=								{
+										return ASSIGN;
 									}
 {types}						{
 
@@ -61,12 +57,27 @@ then							{return THEN;}
 											yylval.text = strdup(yytext);
 											return NUM;
 										}
-
+-[0-9]+\.[0-9]			{
+											fprintf(stderr,"\n\nNUM = %s\n\n",yytext);
+											yylval.text = strdup(yytext);
+											return NUM;
+										}
+[0-9]+\.[0-9]				{
+											fprintf(stderr,"\n\nNUM = %s\n\n",yytext);
+											yylval.text = strdup(yytext);
+											return NUM;
+										}
+-[0-9]+							{
+											fprintf(stderr,"\n\nNUM = %s\n\n",yytext);
+											yylval.text = strdup(yytext);
+											return NUM;
+										}
 [0-9]+							{
 											fprintf(stderr,"\n\nNUM = %s\n\n",yytext);
 											yylval.text = strdup(yytext);
 											return NUM;
 										}
+
 
 [a-zA-Z]_[a-zA-Z0-9]*	{
 												fprintf(stderr,"\n\nNAME = %s\n\n",yytext);
@@ -80,6 +91,13 @@ then							{return THEN;}
 												return NAME;
 											}
 
+{actions}							{
+												yylval.ival = get_action_from_str(yytext);
+												update_str_from_action(yylval.ival);
+												fprintf(stderr,"\n\nACTION = %s\n\n", currentAction);
+												free(currentAction);
+												return ACTION;
+											}
 
 
 .											{

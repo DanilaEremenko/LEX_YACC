@@ -18,6 +18,7 @@ int line_number = 0;
 int tab_num = 0;
 char *tab_str;
 int block_next_tab = 0;
+int dec_after_next = 0;
 
 
 void tab_update(){
@@ -35,6 +36,8 @@ void tab_update(){
 #define TAB_INC() if(!block_next_tab){tab_num++;}
 
 #define TAB_DEC() if(tab_num != 0){tab_num--;}
+
+#define TAB_DEC_TRY() if(dec_after_next){tab_num--;dec_after_next=0;}
 
 #define TAB_PRINT() tab_update();if(tab_num != 0){printf("%s",tab_str);}
 
@@ -94,7 +97,7 @@ void update_str_from_action(int action){
         currentAction = strdup("==");
         return;
       case A_ASSIGN:
-        currentAction = strdup("=");
+        currentAction = strdup(":=");
         return;
       case A_EMPTY:
         currentAction = strdup("");
@@ -124,7 +127,7 @@ int get_action_from_str(char *str){
     return A_LESSEQ;
   }else if(!strcmp(str,"==")){
     return A_EQ;
-  }else if(!strcmp(str,"=")){
+  }else if(!strcmp(str,":=")){
     return A_ASSIGN;
   }else{
     fprintf(stderr, "\n\nUNDEFINED ACTION, EXITING...\n\n");
@@ -132,4 +135,13 @@ int get_action_from_str(char *str){
   }
 
 
+}
+
+char* string_concat(const char *s1, const char *s2)
+{
+    char *result = malloc(strlen(s1) + strlen(s2) + 1); // +1 for the null-terminator
+    // in real code you would check for errors in malloc here
+    strcpy(result, s1);
+    strcat(result, s2);
+    return result;
 }

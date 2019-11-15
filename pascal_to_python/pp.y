@@ -87,7 +87,7 @@ func_call:
       {
 
         printf("%s() PARSED\n",$1);
-        /* currentOperand = string_concat($1,"(");
+        currentOperand = string_concat($1,"(");
         currentWord = firstWord;
         while(currentWord->next != NULL){
           currentOperand = string_concat(currentOperand ,string_concat(currentWord->buffer,","));
@@ -95,12 +95,13 @@ func_call:
           free(currentWord->prev);
         }
         currentOperand = string_concat(currentOperand, string_concat(currentWord->buffer,")"));
-        free(currentWord); */
+        free(currentWord);
       }
 
 func_call_args_seq:
-|   func_call_args_seq ',' expression
-expression
+      func_call_args_seq ',' expression
+
+|     expression
 
 
 expression:
@@ -110,20 +111,6 @@ expression:
         update_str_from_action($2);
         fprintf(stderr,"\n\naction = %s,exp_operand = %s\n\n",currentAction,currentOperand);
       }
-|      expression ACTION '('
-      {
-        add_new_expression(strdup("("), $2);
-      }
-
-|      expression ACTION ')'
-      {
-        add_new_expression(strdup(")"), $2);
-      }
-|      expression exp_operand
-      {
-        add_new_expression(currentOperand, A_EMPTY);
-      }
-
 |     ACTION exp_operand
       {
         firstExpersion = calloc(1,sizeof(ExpressionChain));
@@ -141,11 +128,11 @@ expression:
       }
 
 exp_operand:
-      NAME
+      NUM
       {
         currentOperand = $1;
       }
-|     NUM
+|     NAME
       {
         currentOperand = $1;
       }
@@ -194,18 +181,7 @@ name_seq:
         {
           add_new_word($3);
         }
-|       name_seq ',' NUM
-        {
-          add_new_word($3);
-        }
 |       NAME
-        {
-          firstWord = calloc(1,sizeof(WordChain));
-          firstWord->buffer = $1;
-          currentWord = firstWord;
-
-        }
-|       NUM
         {
           firstWord = calloc(1,sizeof(WordChain));
           firstWord->buffer = $1;

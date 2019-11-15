@@ -77,9 +77,9 @@ elif [[ $MODE = "-e" ]];then
 elif [[ $MODE = "-t" ]];then
 	echo -e "\n______________________TEST MODE________________________\n";
 	cd tests;
-	for test_name in $(cat 'test_names.cfg');do
+	for test_name in $(cat 'test_names.cfg' | grep -v '\#');do
 		echo -e "$test_name\n"
-		../a.out < $test_name.pas > $test_name.res
+		../a.out < $test_name.pas > $test_name-res.py
 
 	done
 

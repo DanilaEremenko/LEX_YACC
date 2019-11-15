@@ -65,7 +65,24 @@ void tab_update(){
     free(currentAction);\
     free(currentExpression);
 
+void add_new_expression(char *arg, int action){
+  currentExpression->next = calloc(1,sizeof(ExpressionChain));
+  currentExpression->next->arg = arg;
+  currentExpression->next->action = action;
 
+  currentExpression->next->prev = currentExpression;
+  currentExpression = currentExpression->next;
+
+
+}
+
+void add_new_word(char *buffer){
+  currentWord->next = calloc(1,sizeof(WordChain));
+  currentWord->next->buffer = buffer;
+  currentWord->next->prev = currentWord;
+  currentWord = currentWord->next;
+
+}
 
 void update_str_from_action(int action){
     switch (action) {

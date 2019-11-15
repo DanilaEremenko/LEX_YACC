@@ -60,7 +60,6 @@ var_assign:
         TAB_PRINT();
         printf("%s = ",$1);
         PRINT_ALL_EXPRESSION_IN_CHAIN();
-        printf(";");
       }
 
 conditional:
@@ -83,54 +82,65 @@ conditional:
         dec_after_next=1;
       }
 
-expression:
-      expression ACTION operand
+func_call:
+      NAME '(' func_call_args_seq ')'
       {
-        currentExpression->next = calloc(1,sizeof(ExpressionChain));
-        currentExpression->next->arg = currentOperand;
-        currentExpression->next->action = $2;
-        update_str_from_action(currentExpression->next->action);
-        fprintf(stderr,"\n\naction = %s,operand = %s\n\n",currentAction,currentOperand);
-        currentExpression->next->prev = currentExpression;
-        currentExpression = currentExpression->next;
+
+        printf("%s() PARSED\n",$1);
+        /* currentOperand = string_concat($1,"(");
+        currentWord = firstWord;
+        while(currentWord->next != NULL){
+          currentOperand = string_concat(currentOperand ,string_concat(currentWord->buffer,","));
+          currentWord = currentWord->next;
+          free(currentWord->prev);
+        }
+        currentOperand = string_concat(currentOperand, string_concat(currentWord->buffer,")"));
+        free(currentWord); */
+      }
+
+func_call_args_seq:
+|   func_call_args_seq ',' expression
+expression
+
+
+expression:
+      expression ACTION exp_operand
+      {
+        add_new_expression(currentOperand, $2);
+        update_str_from_action($2);
+        fprintf(stderr,"\n\naction = %s,exp_operand = %s\n\n",currentAction,currentOperand);
       }
 |      expression ACTION '('
       {
-        currentExpression->next = calloc(1,sizeof(ExpressionChain));
-        currentExpression->next->arg = strdup("(");
-        currentExpression->next->action = $2;
-
-        currentExpression->next->prev = currentExpression;
-        currentExpression = currentExpression->next;
+        add_new_expression(strdup("("), $2);
       }
 
 |      expression ACTION ')'
       {
-        currentExpression->next = calloc(1,sizeof(ExpressionChain));
-        currentExpression->next->arg = strdup(")");
-        currentExpression->next->action = $2;
-
-        currentExpression->next->prev = currentExpression;
-        currentExpression = currentExpression->next;
+        add_new_expression(strdup(")"), $2);
+      }
+|      expression exp_operand
+      {
+        add_new_expression(currentOperand, A_EMPTY);
       }
 
-|     ACTION operand
+|     ACTION exp_operand
       {
         firstExpersion = calloc(1,sizeof(ExpressionChain));
         firstExpersion->arg = currentOperand;
         firstExpersion->action = $1;
         currentExpression = firstExpersion;
       }
-|     operand
+|     exp_operand
       {
         firstExpersion = calloc(1,sizeof(ExpressionChain));
         firstExpersion->arg = currentOperand;
         firstExpersion->action = A_EMPTY;
         currentExpression = firstExpersion;
-        fprintf(stderr,"\n\noperand = %s\n\n",currentExpression->arg);
+        fprintf(stderr,"\n\nexp_operand = %s\n\n",currentExpression->arg);
       }
 
-operand:
+exp_operand:
       NAME
       {
         currentOperand = $1;
@@ -140,9 +150,12 @@ operand:
         currentOperand = $1;
       }
 |     func_call
+      {
+        currentOperand = currentOperand;
+      }
 
 func_decl:
-      FUNCTION NAME '(' args_seq ')' ':' TYPE ';'
+      FUNCTION NAME '(' func_init_args_seq ')' ':' TYPE ';'
       {
         TAB_PRINT();
         printf("def %s(",$2);
@@ -152,19 +165,10 @@ func_decl:
         block_next_tab = 1;
 
       };
-func_call:
-      NAME '(' name_seq ')'
-      {
-        currentOperand = string_concat($1,"(");
-        currentWord = firstWord;
-        while(currentWord->next != NULL){
-          currentOperand = string_concat(currentOperand ,string_concat(currentWord->buffer,","));
-          currentWord = currentWord->next;
-          free(currentWord->prev);
-        }
-        currentOperand = string_concat(currentOperand, string_concat(currentWord->buffer,")"));
-        free(currentWord);
-      }
+
+func_init_args_seq:
+       func_init_args_seq ',' name_seq ':' TYPE
+|      name_seq ':' TYPE
 
 
 var_decl:
@@ -185,44 +189,29 @@ var_decl:
           }
         }
 
-args_seq:
-       args_seq ',' name_seq ':' TYPE
-|      name_seq ':' TYPE
-
 name_seq:
-      name_seq ',' NAME
+        name_seq ',' NAME
         {
-          currentWord->next = calloc(1,sizeof(WordChain));
-          currentWord->next->buffer = $3;
-          currentWord->next->prev = currentWord;
-          currentWord = currentWord->next;
-
-
+          add_new_word($3);
         }
-|     name_seq ',' NUM
+|       name_seq ',' NUM
         {
-          currentWord->next = calloc(1,sizeof(WordChain));
-          currentWord->next->buffer = $3;
-          currentWord->next->prev = currentWord;
-          currentWord = currentWord->next;
-
-
+          add_new_word($3);
         }
-|     NAME
+|       NAME
         {
           firstWord = calloc(1,sizeof(WordChain));
           firstWord->buffer = $1;
           currentWord = firstWord;
 
         }
-|     NUM
+|       NUM
         {
           firstWord = calloc(1,sizeof(WordChain));
           firstWord->buffer = $1;
           currentWord = firstWord;
 
         }
-
 
 
 %%

@@ -1,13 +1,15 @@
-struct WordChain{
-  char *buffer;
-  struct WordChain *prev;
-  struct WordChain *next;
-}typedef WordChain;
-
-struct ExpressionChain{
+struct Expression{
   char *arg;
   int action;
-  struct ExpressionChain *prev;
-  struct ExpressionChain *next;
+  struct Expression *prev;
+  struct Expression *next;
 
-}typedef ExpressionChain;
+}typedef Expression;
+
+
+struct Str{
+  char *buffer;
+  struct Str *prev;
+  struct Str *next;
+
+}typedef Str;

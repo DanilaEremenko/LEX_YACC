@@ -45,7 +45,10 @@ lines:
 line:
       NAME ':' '=' expression ';'
 |     func_decl     {TAB_DEC_TRY();}
-|     func_call ';' {TAB_PRINT();printf("%s",currentOperand);TAB_DEC_TRY();}
+|     func_call ';' {TAB_PRINT();
+                    char *full_str = get_str_chain(", ",1);
+                    printf("%s",full_str);
+                    TAB_DEC_TRY();}
 |     var_decl      {TAB_DEC_TRY();}
 |     var_assign    {TAB_DEC_TRY();}
 |     conditional
@@ -59,7 +62,6 @@ var_assign:
       {
         TAB_PRINT();
         printf("%s = ",$1);
-        PRINT_ALL_EXPRESSION_IN_CHAIN();
       }
 
 conditional:
@@ -67,7 +69,6 @@ conditional:
       {
         TAB_PRINT();
         printf("if ");
-        PRINT_ALL_EXPRESSION_IN_CHAIN();
         printf(":");
         TAB_INC();
         dec_after_next=1;
@@ -76,7 +77,6 @@ conditional:
       {
         TAB_PRINT();
         printf("if ");
-        PRINT_ALL_EXPRESSION_IN_CHAIN();
         printf(":");
         TAB_INC();
         dec_after_next=1;
@@ -85,23 +85,29 @@ conditional:
 func_call:
       NAME '(' func_call_args_seq ')'
       {
-
-        printf("%s() PARSED\n",$1);
-        currentOperand = string_concat($1,"(");
-        currentWord = firstWord;
-        while(currentWord->next != NULL){
-          currentOperand = string_concat(currentOperand ,string_concat(currentWord->buffer,","));
-          currentWord = currentWord->next;
-          free(currentWord->prev);
-        }
-        currentOperand = string_concat(currentOperand, string_concat(currentWord->buffer,")"));
-        free(currentWord);
+        currentStr->buffer = string_concat(currentStr->buffer, ")");
+        currentStr->buffer = string_concat("(",currentStr->buffer);
+        currentStr->buffer = string_concat($1,currentStr->buffer);
+        fprintf(stderr,"\n\nFUNC CALL PARSE = %s\n\n",currentStr->buffer);
       }
 
 func_call_args_seq:
       func_call_args_seq ',' expression
+      {
+        add_new_str(get_expression_chain(1));
+        fprintf(stderr,"\n\ncurrent str = %s\n\n",currentStr->buffer);
+        fprintf(stderr,"\n\ncurrent str prev = %s\n\n",currentStr->prev->buffer);
+      }
 
 |     expression
+      {
+        firstStr = calloc(1,sizeof(Str));
+        fprintf(stderr,"\n\nsaving chain to str\n\n");
+        firstStr->buffer = get_expression_chain(1);
+        currentStr = firstStr;
+        fprintf(stderr,"\n\nfirst str = %s\n\n",firstStr->buffer);
+
+      }
 
 
 expression:
@@ -113,18 +119,18 @@ expression:
       }
 |     ACTION exp_operand
       {
-        firstExpersion = calloc(1,sizeof(ExpressionChain));
+        firstExpersion = calloc(1,sizeof(Expression));
         firstExpersion->arg = currentOperand;
         firstExpersion->action = $1;
         currentExpression = firstExpersion;
       }
 |     exp_operand
       {
-        firstExpersion = calloc(1,sizeof(ExpressionChain));
+        firstExpersion = calloc(1,sizeof(Expression));
         firstExpersion->arg = currentOperand;
         firstExpersion->action = A_EMPTY;
         currentExpression = firstExpersion;
-        fprintf(stderr,"\n\nexp_operand = %s\n\n",currentExpression->arg);
+        fprintf(stderr,"\n\nNEW EXP OPERAND = %s\n\n",currentExpression->arg);
       }
 
 exp_operand:
@@ -138,7 +144,8 @@ exp_operand:
       }
 |     func_call
       {
-        currentOperand = currentOperand;
+        currentOperand = currentStr->buffer;
+
       }
 
 func_decl:
@@ -146,7 +153,6 @@ func_decl:
       {
         TAB_PRINT();
         printf("def %s(",$2);
-        PRINT_ALL_WORDS_IN_CHAIN(", ")
         printf("):");
         TAB_INC();
         block_next_tab = 1;
@@ -162,7 +168,6 @@ var_decl:
       VAR name_seq ':' TYPE ';'
         {
           TAB_PRINT();
-          PRINT_ALL_WORDS_IN_CHAIN(" = ")
           switch($4){
             case T_INT:
               printf(" = 0");
@@ -179,13 +184,15 @@ var_decl:
 name_seq:
         name_seq ',' NAME
         {
-          add_new_word($3);
+          add_new_expression($3, A_EMPTY);
         }
 |       NAME
         {
-          firstWord = calloc(1,sizeof(WordChain));
-          firstWord->buffer = $1;
-          currentWord = firstWord;
+
+          firstExpersion = calloc(1,sizeof(Expression));
+          firstExpersion->arg = $1;
+          firstExpersion->action = A_EMPTY;
+          currentExpression = firstExpersion;
 
         }
 

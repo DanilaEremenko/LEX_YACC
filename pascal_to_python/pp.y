@@ -46,8 +46,8 @@ line:
       NAME ':' '=' expression ';'
 |     func_decl     {TAB_DEC_TRY();}
 |     func_call ';' {TAB_PRINT();
-                    char *full_str = get_str_chain(", ",1);
-                    printf("%s",full_str);
+                    fprintf(stderr, "\n\nFUNC LINE  = %s\n\n", currentOperand);
+                    printf("%s",currentOperand);
                     TAB_DEC_TRY();}
 |     var_decl      {TAB_DEC_TRY();}
 |     var_assign    {TAB_DEC_TRY();}
@@ -85,28 +85,32 @@ conditional:
 func_call:
       NAME '(' func_call_args_seq ')'
       {
-        currentStr->buffer = string_concat(currentStr->buffer, ")");
-        currentStr->buffer = string_concat("(",currentStr->buffer);
-        currentStr->buffer = string_concat($1,currentStr->buffer);
-        fprintf(stderr,"\n\nFUNC CALL PARSE = %s\n\n",currentStr->buffer);
+        free(currentOperand);
+        currentOperand = get_str_chain(", ", 1);
+        currentOperand = string_concat(currentOperand, ")");
+        currentOperand = string_concat("(", currentOperand);
+        currentOperand = string_concat($1, currentOperand);
+        fprintf(stderr,"\n\nFUNC CALL PARSED = %s\n\n", currentOperand);
       }
 
 func_call_args_seq:
       func_call_args_seq ',' expression
       {
+        fprintf(stderr,"\n\nADDING NEW STR\n\n");
         add_new_str(get_expression_chain(1));
-        fprintf(stderr,"\n\ncurrent str = %s\n\n",currentStr->buffer);
-        fprintf(stderr,"\n\ncurrent str prev = %s\n\n",currentStr->prev->buffer);
+        fprintf(stderr,"\n\nNEW ARG = %s\n\n",currentCallLevel->currentStr->buffer);
+        fprintf(stderr,"\n\nPREV ARG = %s\n\n",currentCallLevel->currentStr->prev->buffer);
+        fprintf(stderr,"\n\n----------------------------\n\n");
       }
 
 |     expression
       {
-        firstStr = calloc(1,sizeof(Str));
-        fprintf(stderr,"\n\nsaving chain to str\n\n");
-        firstStr->buffer = get_expression_chain(1);
-        currentStr = firstStr;
-        fprintf(stderr,"\n\nfirst str = %s\n\n",firstStr->buffer);
-
+        incRecCallLevel();
+        currentCallLevel->firstStr = calloc(1,sizeof(Str));
+        currentCallLevel->firstStr->buffer = get_expression_chain(1);
+        currentCallLevel->currentStr = currentCallLevel->firstStr;
+        fprintf(stderr,"\n\nFIRST ARG = %s\n\n",currentCallLevel->firstStr->buffer);
+        fprintf(stderr,"\n\n----------------------------\n\n");
       }
 
 
@@ -115,7 +119,7 @@ expression:
       {
         add_new_expression(currentOperand, $2);
         update_str_from_action($2);
-        fprintf(stderr,"\n\naction = %s,exp_operand = %s\n\n",currentAction,currentOperand);
+        fprintf(stderr,"\n\nACTION = %s,EXP_OPERAND = %s\n\n",currentAction,currentOperand);
       }
 |     ACTION exp_operand
       {
@@ -144,7 +148,8 @@ exp_operand:
       }
 |     func_call
       {
-        currentOperand = currentStr->buffer;
+        currentOperand = currentOperand;
+        decRecCallLevel();
 
       }
 

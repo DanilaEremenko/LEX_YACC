@@ -6,9 +6,7 @@
 #include "structures.h"
 
 /*-------------------------variables----------------*/
-
-Str *firstStr;
-Str *currentStr;
+RecStack *currentCallLevel;
 
 Expression *firstExpersion;
 Expression *currentExpression;
@@ -60,13 +58,37 @@ void tab_update(){
 
 #define TAB_PRINT() tab_update();if(tab_num != 0){printf("%s",tab_str);}
 
+
+/*-------------------------recoursive calls processing----------------*/
+void incRecCallLevel(){
+  if(currentCallLevel==NULL){
+    currentCallLevel = calloc(1, sizeof(RecStack));
+    currentCallLevel->prevLevel = currentCallLevel;
+    currentCallLevel->recNum = currentCallLevel->recNum + 1;
+  }else{
+    currentCallLevel->nextLevel = calloc(1, sizeof(RecStack));
+    currentCallLevel->nextLevel->prevLevel = currentCallLevel;
+    currentCallLevel->nextLevel->recNum = currentCallLevel->recNum + 1;
+    currentCallLevel = currentCallLevel->nextLevel;
+  }
+  fprintf(stderr, "-----------------------------------\n");
+  fprintf(stderr, "\n\nCURRENT CALL LEVEL INC TO = %d\n\n", currentCallLevel->recNum);
+
+}
+
+void decRecCallLevel(){
+  currentCallLevel = currentCallLevel->prevLevel;
+  free(currentCallLevel->nextLevel);
+}
+
+
 /*-------------------------str processing----------------*/
 void add_new_str(char *buffer){
-  currentStr->next = calloc(1,sizeof(Expression));
-  currentStr->next->buffer = buffer;
+  currentCallLevel->currentStr->next = calloc(1,sizeof(Expression));
+  currentCallLevel->currentStr->next->buffer = buffer;
 
-  currentStr->next->prev = currentStr;
-  currentStr = currentStr->next;
+  currentCallLevel->currentStr->next->prev = currentCallLevel->currentStr;
+  currentCallLevel->currentStr = currentCallLevel->currentStr->next;
 
 
 }
@@ -74,25 +96,24 @@ void add_new_str(char *buffer){
 char* get_str_chain(char *divstr, int free_chain){
   char *full_chain_str = "";
 
-
   full_chain_str = string_concat(
                           full_chain_str ,
-                          firstStr->buffer
+                          currentCallLevel->firstStr->buffer
                         );
-
-  currentStr = firstStr->next;
-  while(currentStr!= NULL){
+  currentCallLevel->currentStr = currentCallLevel->firstStr->next;
+  while(currentCallLevel->currentStr!= NULL){
     full_chain_str = string_concat(
                             full_chain_str ,
-                            string_concat(divstr, currentStr->buffer)
+                            string_concat(divstr, currentCallLevel->currentStr->buffer)
                           );
 
     if(free_chain){
-      free(currentStr->prev);
+      free(currentCallLevel->currentStr->prev);
     }
-    currentStr = currentStr->next;
+    currentCallLevel->currentStr = currentCallLevel->currentStr->next;
 
   }
+  fprintf(stderr, "\n\nGETTING FULL CHAIN STR = %s\n\n", full_chain_str);
   return full_chain_str;
 
 }

@@ -13,3 +13,12 @@ struct Str{
   struct Str *next;
 
 }typedef Str;
+
+struct RecStack{
+  int recNum;
+  struct Str *firstStr;
+  struct Str *currentStr;
+  struct RecStack *prevLevel;
+  struct RecStack *nextLevel;
+
+}typedef RecStack;

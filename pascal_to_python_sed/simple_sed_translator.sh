@@ -65,8 +65,12 @@ if [[ $TEST_LIST ]];then
 		#------------------------ TRANSLATE FILE LOOP ------------------------------
 		while read line ;do
 			target_line="$line"
+			#-------------------- COMMENTS PROCESSING --------------------------------
+			if [[ $(echo $line | sed 's/ *//' | cut -c1-2) == '//' ]];then
+				pretty_print "COMMENT LINE:'$line' -> '$target_line'"
+
 			#-------------------- IF PROCESSING --------------------------------------
-			if [[ $(echo $line | grep 'if') ]];then
+			elif [[ $(echo $line | grep 'if') ]];then
 				target_line=$(echo $target_line | sed 's/ then/:/')
 				pretty_print "IF LINE:'$line' -> '$target_line'"
 
@@ -91,6 +95,17 @@ if [[ $TEST_LIST ]];then
 
 				new_tabs="$tabs\t"
 				prev_func="true"
+
+			#-------------------- PROCEDURE PROCESSING --------------------------------
+		elif [[ $(echo $line | grep 'procedure') ]];then
+				target_line="$(echo $target_line | sed 	-e 's/procedure/def/'\
+																								-e 's/\ : .*)/)/'\
+																								-e 's/\: .*;//'\
+																								):"
+				pretty_print "FUNCTION LINE:'$line' -> '$target_line'"
+
+				new_tabs="$tabs\t"
+				prev_func="true"
 			#-------------------- VAR PROCESSING -------------------------------------
 			elif [[ $(echo $line | grep 'var ') ]];then
 				target_line="$(echo $target_line | sed 	-e 's/var //'\
@@ -106,6 +121,22 @@ if [[ $TEST_LIST ]];then
 
 				new_tabs=$(echo $tabs | cut -c3-)
 
+
+			#-------------------- REPEAT PROCESSING ----------------------------------
+			elif [[ $(echo $line | grep 'repeat') ]];then
+				target_line=$(echo $target_line | sed 's/repeat/while(True):/')
+				pretty_print "REPEAT LINE:'$line' -> '$target_line'"
+
+				new_tabs="$tabs\t"
+
+			#-------------------- UNTILL PROCESSING ----------------------------------
+			elif [[ $(echo $line | grep 'until') ]];then
+					target_line=$(echo $target_line | sed -e 's/until/if/'\
+																								-e 's/;/:/')
+					target_line="$target_line\n$tabs\tbreak"
+					pretty_print "UNTIL LINE:'$line' -> '$target_line'"
+					new_tabs=$(echo $tabs | cut -c3-)
+
 			#-------------------- CHECK  PREV IF -------------------------------------
 			elif [[ $prev_if ]];then
 				prev_if=""
@@ -114,7 +145,7 @@ if [[ $TEST_LIST ]];then
 				pretty_print "LINE:'$line' -> '$target_line'"
 			fi
 
-			target_line=$(echo "$target_line" | sed -e 's/:=/=/' -e 's/;//')
+			target_line=$(echo "$target_line" | sed -e 's/:=/=/' -e 's/;//' -e 's/\/\//#/')
 
 			echo -e "$tabs$target_line"  >> $res_file
 

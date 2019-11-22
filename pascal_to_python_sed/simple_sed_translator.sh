@@ -61,18 +61,18 @@ if [[ $TEST_LIST ]];then
 		old_tabs=""
 		prev_func=""
 		prev_if=""
-
+		line_i=0
 		#------------------------ TRANSLATE FILE LOOP ------------------------------
 		while read line ;do
 			target_line="$line"
 			#-------------------- COMMENTS PROCESSING --------------------------------
 			if [[ $(echo $line | sed 's/ *//' | cut -c1-2) == '//' ]];then
-				pretty_print "COMMENT LINE:'$line' -> '$target_line'"
+				pretty_print $line_i "COMMENT LINE:'$line' -> '$target_line'"
 
 			#-------------------- IF PROCESSING --------------------------------------
 			elif [[ $(echo $line | grep 'if') ]];then
 				target_line=$(echo $target_line | sed 's/ then/:/')
-				pretty_print "IF LINE:'$line' -> '$target_line'"
+				pretty_print $line_i "IF LINE:'$line' -> '$target_line'"
 
 				if [[ $(echo $target_line | grep ';') ]];then prev_if=""
 				else prev_if="true";new_tabs="$tabs\t";fi
@@ -80,7 +80,7 @@ if [[ $TEST_LIST ]];then
 			#-------------------- BEGIN PROCESSING -----------------------------------
 			elif [[ $(echo $line | grep 'begin') ]];then
 				target_line=$(echo $target_line | sed 's/begin//')
-				pretty_print "BEGIN LINE:'$line' -> '$target_line'"
+				pretty_print $line_i "BEGIN LINE:'$line' -> '$target_line'"
 
 				if [[ $prev_func || $prev_if ]];then prev_func="";prev_if="";
 				else new_tabs="$tabs\t";fi
@@ -88,36 +88,61 @@ if [[ $TEST_LIST ]];then
 			#-------------------- FUNCTION PROCESSING --------------------------------
 			elif [[ $(echo $line | grep 'function') ]];then
 				target_line="$(echo $target_line | sed 	-e 's/function/def/'\
-																								-e 's/\ : .*)/)/'\
-																								-e 's/\: .*;//'\
+																								-e 's/).*;/)/'\
+																								-e 's/:.*;/,/'\
+																								-e 's/:.*)/)/'\
 																								):"
-				pretty_print "FUNCTION LINE:'$line' -> '$target_line'"
+				pretty_print $line_i "FUNCTION LINE:'$line' -> '$target_line'"
 
 				new_tabs="$tabs\t"
 				prev_func="true"
 
 			#-------------------- PROCEDURE PROCESSING --------------------------------
-		elif [[ $(echo $line | grep 'procedure') ]];then
+			elif [[ $(echo $line | grep 'procedure') ]];then
 				target_line="$(echo $target_line | sed 	-e 's/procedure/def/'\
-																								-e 's/\ : .*)/)/'\
-																								-e 's/\: .*;//'\
+																								-e 's/).*;/)/'\
+																								-e 's/:.*;/,/'\
+																								-e 's/:.*)/)/'\
 																								):"
-				pretty_print "FUNCTION LINE:'$line' -> '$target_line'"
+				pretty_print $line_i "FUNCTION LINE:'$line' -> '$target_line'"
 
 				new_tabs="$tabs\t"
 				prev_func="true"
-			#-------------------- VAR PROCESSING -------------------------------------
-			elif [[ $(echo $line | grep 'var ') ]];then
+			#-------------------- VAR INT PROCESSING -------------------------------------
+			elif [[ $(echo $line | grep ': integer') ]];then
 				target_line="$(echo $target_line | sed 	-e 's/var //'\
-																								-e 's/,/ =/'\
+																								-e 's/,/ =/g'\
+																								-e 's/\: .*;/= 0/'\
+																								)"
+				pretty_print $line_i "VAR INT LINE:'$line' -> '$target_line'"
+
+			#-------------------- VAR DOUBLE PROCESSING -------------------------------------
+			elif [[ $(echo $line | grep ': double') ]];then
+				target_line="$(echo $target_line | sed 	-e 's/var //'\
+																								-e 's/,/ =/g'\
 																								-e 's/\: .*;/= 0.0/'\
 																								)"
-				pretty_print "VAR LINE:'$line' -> '$target_line'"
+				pretty_print $line_i "VAR DOUBLE LINE:'$line' -> '$target_line'"
+
+			#-------------------- VAR REAL PROCESSING -------------------------------------
+			elif [[ $(echo $line | grep ': real') ]];then
+				target_line="$(echo $target_line | sed 	-e 's/var //'\
+																								-e 's/,/ =/g'\
+																								-e 's/\: .*;/= 0.0/'\
+																								)"
+				pretty_print $line_i "VAR REAL LINE:'$line' -> '$target_line'"
+
+			#-------------------- VAR REAL PROCESSING -------------------------------------
+			elif [[ $(echo $line | grep ': array of') ]];then
+				target_line="$(echo $target_line | sed 	-e 's/: array of .*/ = []/')"
+				pretty_print $line_i "ARRAY DECL LINE:'$line' -> '$target_line'"
+
+
 
 			#-------------------- END PROCESSING -------------------------------------
 			elif [[ $(echo $line | grep 'end') ]];then
 				target_line=$(echo $target_line | sed 's/end;//')
-				pretty_print "END LINE:'$line' -> '$target_line'"
+				pretty_print $line_i "END LINE:'$line' -> '$target_line'"
 
 				new_tabs=$(echo $tabs | cut -c3-)
 
@@ -125,24 +150,24 @@ if [[ $TEST_LIST ]];then
 			#-------------------- REPEAT PROCESSING ----------------------------------
 			elif [[ $(echo $line | grep 'repeat') ]];then
 				target_line=$(echo $target_line | sed 's/repeat/while(True):/')
-				pretty_print "REPEAT LINE:'$line' -> '$target_line'"
+				pretty_print $line_i "REPEAT LINE:'$line' -> '$target_line'"
 
 				new_tabs="$tabs\t"
 
 			#-------------------- UNTILL PROCESSING ----------------------------------
 			elif [[ $(echo $line | grep 'until') ]];then
-					target_line=$(echo $target_line | sed -e 's/until/if/'\
-																								-e 's/;/:/')
-					target_line="$target_line\n$tabs\tbreak"
-					pretty_print "UNTIL LINE:'$line' -> '$target_line'"
-					new_tabs=$(echo $tabs | cut -c3-)
+				target_line=$(echo $target_line | sed -e 's/until/if/'\
+																							-e 's/;/:/')
+				target_line="$target_line\n$tabs\tbreak"
+				pretty_print $line_i "UNTIL LINE:'$line' -> '$target_line'"
+				new_tabs=$(echo $tabs | cut -c3-)
 
 			#-------------------- CHECK  PREV IF -------------------------------------
 			elif [[ $prev_if ]];then
 				prev_if=""
 				new_tabs=$(echo $tabs | cut -c3-)
 			else
-				pretty_print "LINE:'$line' -> '$target_line'"
+				pretty_print $line_i "LINE:'$line' -> '$target_line'"
 			fi
 
 			target_line=$(echo "$target_line" | sed -e 's/:=/=/' -e 's/;//' -e 's/\/\//#/')
@@ -151,6 +176,7 @@ if [[ $TEST_LIST ]];then
 
 			old_tabs=$tabs
 			tabs=$new_tabs
+			((line_i++))
 		done < $test_file.pas
 
 	#-------------------------- CHECK TEST ---------------------------------------

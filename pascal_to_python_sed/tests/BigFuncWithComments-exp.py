@@ -1,9 +1,9 @@
-def _SumRad(fi) :
-	dl = b1, b2 = 0.0
-	FiRad, sd, hour1, hour2, shour1, shour2 : double
-	Iday : integer
-	cFluxRad : double
-	TotalFluxRad : double
+def _SumRad(fi , cDate ):
+	dl = b1 = b2 = 0.0
+	FiRad = sd = hour1 = hour2 = shour1 = shour2 = 0.0
+	Iday = 0
+	cFluxRad = 0.0
+	TotalFluxRad = 0.0
 	
 	dl = _DayLength(fi, cDate)
 	# Переводим широту в радианы

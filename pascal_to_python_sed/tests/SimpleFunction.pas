@@ -1,4 +1,4 @@
-function AP(arg1, arg2 : double) : double;
+function AP(arg1, arg2 : double ; arg3, arg4, arg5 : double) : double;
 var a, al : double;
 begin
    if (cLAI>1e-8) then
